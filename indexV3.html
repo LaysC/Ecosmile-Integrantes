@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V2SouSmile - Portal do Cliente & Admin (Atualizado)</title>
+  
+  <!-- Importação de fonte moderna e limpa (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS para estilização rápida e responsiva -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Biblioteca html2canvas para captura de ecrã em PNG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              coral: '#ff9466',        // Coral Oficial
+              blue: '#4d81f7',         // Azul Oficial da Jornada
+              emerald: '#296e6e',      // Esmeralda para textos de suporte
+              black: '#303030',        // Grafite Escuro Oficial
+              peach: '#ffd4ab',        // Pêssego Suave (Bordas dos inputs)
+              grey: '#8b8b8b',         // Cinza de suporte
+              lightEmerald: '#d1f0f0', // Fundo verde suave para badges
+              lightCoral: '#ffe5cc',   // Fundo coral suave
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilização para simular a curvatura perfeita física de um telemóvel topo de gama */
+    .phone-shadow {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 
+                  0 0 0 1px rgba(0, 0, 0, 0.1),
+                  inset 0 0 4px rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Input com transições de foco elegantes */
+    .input-field {
+      border-color: #ffd4ab;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .input-field:focus {
+      border-color: #ff9466 !important;
+      box-shadow: 0 0 0 4px rgba(255, 148, 102, 0.12);
+      outline: none;
+    }
+
+    /* Botão de pílula premium */
+    .btn-pill {
+      background-color: #ff9466;
+      transition: all 0.25s ease-in-out;
+    }
+    .btn-pill:hover {
+      background-color: #f58353;
+    }
+    .btn-pill:active {
+      transform: translateY(0);
+    }
+
+    /* Transição de ecrã suave */
+    .view-transition {
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    /* Ocultar barra de rolagem mantendo a funcionalidade nativa */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Barra de Progresso Circular Customizada */
+    .circle-progress {
+      transition: stroke-dashoffset 1s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 text-[#303030] antialiased relative">
+
+  <!-- BOTÃO FLUTUANTE DE EXPORTAÇÃO (Gravar removido) -->
+  <div class="mb-6 sm:absolute sm:top-6 sm:right-6 sm:mb-0 z-50 flex items-center space-x-3">
+    <button onclick="baixarComoPNG()" id="btnDownload" class="bg-brand-black text-white hover:bg-brand-coral px-5 py-3 rounded-2xl shadow-xl font-bold text-sm flex items-center space-x-2 transition-all duration-300 active:scale-95">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+      <span id="btnDownloadText">Baixar PNG</span>
+    </button>
+  </div>
+
+  <!-- DISPOSITIVO MÓVEL FÍSICO SIMULADO -->
+  <div id="phone-simulator" class="relative w-full max-w-[390px] h-[844px] bg-white rounded-[56px] border-[12px] border-slate-950 phone-shadow overflow-hidden flex flex-col justify-between select-none">
+    
+    <!-- Câmera Frontal / Dynamic Island -->
+    <div class="absolute top-3 left-1/2 transform -translate-x-1/2 w-28 h-7 bg-slate-950 rounded-full z-30 flex items-center justify-between px-4">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#101010] border border-slate-900"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[#151515]"></span>
+    </div>
+
+    <!-- Barra de Status do Sistema -->
+    <div class="px-8 pt-3 pb-2 flex justify-between items-center text-[11px] text-slate-500 font-bold z-20 bg-white">
+      <span>09:41</span>
+      <div class="flex items-center space-x-1.5">
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M2 22h20V2z" /></svg>
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 21l-12-18h24z" /></svg>
+        <div class="w-5 h-2.5 border border-slate-400 rounded-sm p-0.5 flex items-center">
+          <div class="h-full w-4 bg-slate-600 rounded-2xs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cabeçalho Interno do Aplicativo -->
+    <div class="px-6 pt-4 flex items-center justify-between z-10 bg-white">
+      <!-- Botão Voltar (<) -->
+      <button id="header-back-button" onclick="voltarParaAnterior()" class="p-2 -ml-2 rounded-full hover:bg-slate-50 transition-colors text-brand-black focus:outline-none" aria-label="Voltar" style="visibility: hidden;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+    </div>
+
+    <!-- ================= TELA DE LOGIN (Sem abas Admin/Cliente) ================= -->
+    <div id="view-login" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-100 transform translate-x-0 relative pb-16">
+      <div class="mb-6 select-none h-12 flex items-center">
+        <div class="flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral leading-none">smile</span>
+        </div>
+      </div>
+      <div class="mb-8">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Acessar portal</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">Minha área</h1>
+      </div>
+      
+      <form id="loginForm" class="space-y-5" onsubmit="executarLogin(event)">
+        <div class="space-y-4">
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+            </span>
+            <input type="email" id="login-email" placeholder="seuemail@exemplo.com.br" required class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field">
+          </div>
+          <div id="login-password-container">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </span>
+              <input type="password" id="login-password" placeholder="Senha" required class="w-full pl-11 pr-12 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field">
+              <button type="button" onclick="togglePassword('login-password', 'eyeOpen-login', 'eyeClosed-login')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
+                <svg id="eyeOpen-login" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                <svg id="eyeClosed-login" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" /></svg>
+              </button>
+            </div>
+            <div class="flex justify-end mt-2 px-1">
+              <button type="button" onclick="irParaRecuperar()" class="text-xs font-bold text-brand-emerald hover:underline focus:outline-none">Esqueceu sua senha?</button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" id="btnSubmitLogin" class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill mt-4 shadow-md">Entrar</button>
+        <p id="login-signup-link" class="text-sm text-brand-grey font-medium text-center mt-5">Não possui conta? <button type="button" onclick="irParaCadastro()" class="font-extrabold hover:underline text-brand-coral ml-1">Cadastre-se</button></p>
+      </form>
+      <!-- Footer embutido na tela de Login -->
+      <div class="absolute bottom-6 left-0 w-full text-center px-8 z-10 flex flex-col items-center">
+        <p class="text-[10px] text-brand-grey font-medium leading-relaxed max-w-[260px]">Ao prosseguir, concorda com os nossos <br><a href="#" class="underline hover:text-brand-black transition-colors">Termos de Serviço</a> e <a href="#" class="underline hover:text-brand-black transition-colors">Política de Privacidade</a>.</p>
+      </div>
+    </div>
+
+    <!-- ================= TELA DE CADASTRO ================= -->
+    <div id="view-cadastro" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden relative pb-16">
+      
+      <!-- Logo Oficial SouSmile -->
+      <div class="mb-4 select-none h-12 flex items-center">
+        <img 
+          src="sousmile_logo_preto_laranja.png" 
+          alt="SouSmile" 
+          class="h-10 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback-cadastro').classList.remove('hidden');"
+        >
+        <div id="logo-fallback-cadastro" class="hidden flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral leading-none">smile</span>
+        </div>
+      </div>
+
+      <!-- Título de Cadastro -->
+      <div class="mb-6">
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight">
+          Preencha seus dados
+        </h1>
+      </div>
+
+      <!-- Formulário de Cadastro -->
+      <form id="cadastroForm" class="space-y-4" onsubmit="executarCadastro(event)">
+        
+        <div class="space-y-3">
+          
+          <!-- Campo Nome -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              id="cadastro-nome"
+              placeholder="Digite seu nome" 
+              required
+              class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+          </div>
+
+          <!-- Campo Email (Envelope Clássico) -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+            </span>
+            <input 
+              type="email" 
+              id="cadastro-email"
+              placeholder="Digite seu email" 
+              required
+              class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+          </div>
+
+          <!-- Campo Senha -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <input 
+              type="password" 
+              id="cadastro-password" 
+              placeholder="Digite sua senha" 
+              required
+              class="w-full pl-11 pr-12 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('cadastro-password', 'eyeOpen-cad', 'eyeClosed-cad')" 
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+            >
+              <svg id="eyeOpen-cad" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eyeClosed-cad" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Campo Confirmar Senha -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <input 
+              type="password" 
+              id="cadastro-confirm" 
+              placeholder="Digite sua senha novamente" 
+              required
+              class="w-full pl-11 pr-12 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('cadastro-confirm', 'eyeOpen-conf', 'eyeClosed-conf')" 
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+            >
+              <svg id="eyeOpen-conf" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eyeClosed-conf" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Botão Cadastrar -->
+        <button 
+          type="submit" 
+          id="btnSubmitCadastro"
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Cadastrar
+        </button>
+
+        <p class="text-sm text-brand-grey font-medium text-center mt-4">
+          Já possui uma conta? 
+          <button type="button" onclick="irParaLogin()" class="font-extrabold hover:underline text-brand-coral ml-1 focus:outline-none">
+            Entre
+          </button>
+        </p>
+
+      </form>
+      <!-- Footer embutido na tela de Cadastro -->
+      <div class="absolute bottom-6 left-0 w-full text-center px-8 z-10 flex flex-col items-center">
+        <p class="text-[10px] text-brand-grey font-medium leading-relaxed max-w-[260px]">Ao prosseguir, você concorda com nossos <br><a href="#" class="underline hover:text-brand-black transition-colors">Termos de Serviço</a> e <a href="#" class="underline hover:text-brand-black transition-colors">Política de Privacidade</a>.</p>
+      </div>
+    </div>
+
+    <!-- ================= TELA DE RECUPERAÇÃO DE SENHA ================= -->
+    <div id="view-recuperar" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden relative pb-16">
+      
+      <!-- Logo Oficial SouSmile (Escondido dinamicamente no estado de sucesso para evitar poluição visual) -->
+      <div id="recuperar-logo" class="mb-6 select-none h-12 flex items-center">
+        <img 
+          src="sousmile_logo_preto_laranja.png" 
+          alt="SouSmile" 
+          class="h-10 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback-recuperar').classList.remove('hidden');"
+        >
+        <div id="logo-fallback-recuperar" class="hidden flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral leading-none">smile</span>
+        </div>
+      </div>
+
+      <!-- ESTADO 1: Solicitar Recuperação -->
+      <div id="recuperar-estado-formulario" class="space-y-6">
+        <div>
+          <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Recuperação de acesso</span>
+          <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+            Recuperar senha
+          </h1>
+          <p class="text-brand-grey text-sm mt-2 font-medium leading-relaxed">
+            Esqueceu sua senha? Digite seu e-mail cadastrado e enviaremos um link de recuperação.
+          </p>
+        </div>
+
+        <!-- Formulário de Envio -->
+        <form id="recuperarForm" class="space-y-5" onsubmit="executarRecuperacao(event)">
+          <div class="space-y-4">
+            <!-- Campo Email (Envelope Clássico) -->
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+              </span>
+              <input 
+                type="email" 
+                id="recuperar-email"
+                placeholder="Digite seu e-mail de acesso" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- Botão Enviar Link -->
+          <button 
+            type="submit" 
+            id="btnSubmitRecuperar"
+            class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+          >
+            Enviar e-mail de recuperação
+          </button>
+        </form>
+
+        <p class="text-sm text-brand-grey font-medium text-center">
+          Lembrou sua senha?
+          <button type="button" onclick="irParaLogin()" class="font-extrabold hover:underline text-brand-coral ml-1 focus:outline-none">
+            Voltar ao login
+          </button>
+        </p>
+      </div>
+
+      <!-- ESTADO 2: Feedback de Sucesso Dinâmico -->
+      <div id="recuperar-estado-sucesso" class="hidden flex flex-col items-center text-center space-y-6 pt-4">
+        <!-- Ícone circular de sucesso da SouSmile -->
+        <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald shadow-inner">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <div class="space-y-3">
+          <h2 class="text-2xl font-bold text-brand-black tracking-tight">E-mail enviado!</h2>
+          <p id="recuperar-mensagem-sucesso" class="text-brand-grey text-base font-medium leading-relaxed px-2">
+            Enviamos um e-mail para recuperação <br>
+            <span id="email-obfuscado" class="font-extrabold text-brand-black select-text"></span>
+          </p>
+        </div>
+
+        <div class="w-full space-y-3 pt-4">
+          <button 
+            onclick="resetarERetornarLogin()" 
+            class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 shadow-md"
+          >
+            Voltar para o Login
+          </button>
+          
+          <p class="text-xs text-brand-grey font-medium">
+            Não recebeu? Verifique a pasta de spam ou 
+            <button onclick="resgatarFormularioRecuperacao()" class="font-bold text-brand-coral underline hover:text-[#f58353] focus:outline-none">
+              tente novamente
+            </button>
+          </p>
+        </div>
+      </div>
+      
+      <!-- Footer embutido na tela de Recuperação -->
+      <div class="absolute bottom-6 left-0 w-full text-center px-8 z-10 flex flex-col items-center">
+        <p class="text-[10px] text-brand-grey font-medium leading-relaxed max-w-[260px]">Ao prosseguir, você concorda com nossos <br><a href="#" class="underline hover:text-brand-black transition-colors">Termos de Serviço</a> e <a href="#" class="underline hover:text-brand-black transition-colors">Política de Privacidade</a>.</p>
+      </div>
+    </div>
+
+    <!-- ================= TELA INICIAL (HOME CLIENTE) ================= -->
+    <div id="view-home" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-8 overflow-y-auto no-scrollbar pb-8">
+      
+      <div class="flex justify-between items-start mb-6 mt-3 space-x-3">
+        <div class="space-y-0.5 flex-1 min-w-0">
+          <span class="text-lg font-medium text-brand-grey tracking-tight block">Boas-vindas,</span>
+          <h1 id="home-user-name" class="text-4xl font-extrabold text-brand-coral tracking-tight leading-none truncate">Felipe</h1>
+          <div class="mt-2 inline-flex items-center px-2 py-1 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-brand-grey uppercase tracking-wider">Código: <strong id="home-patient-code" class="text-brand-coral ml-0.5">NDCW</strong></span>
+          </div>
+        </div>
+        <button onclick="sairDaConta()" class="flex-shrink-0 flex items-center space-x-1 text-[#8b8b8b] hover:text-red-500 transition-colors duration-200 py-2 px-1 focus:outline-none">
+          <span class="text-[10px] font-bold uppercase tracking-widest">SAIR</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Resumo de Progresso da Jornada -->
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="bg-[#4d81f7] text-white rounded-[24px] p-5 flex flex-col justify-between shadow-sm min-h-[140px]">
+          <span class="text-[34px] font-light tracking-tight mt-1" id="dash-phase">3/17</span>
+          <p class="text-[11px] font-medium leading-tight text-white/90">essa é a fase <span id="dash-phase-num" class="font-bold">3</span> de 17 da sua jornada</p>
+        </div>
+        <div class="bg-slate-50 border border-slate-100 rounded-[24px] flex flex-col items-center justify-center shadow-sm relative min-h-[140px]">
+           <span class="absolute top-4 text-[9px] font-extrabold text-brand-grey uppercase tracking-wider">Progresso</span>
+           <svg class="w-20 h-20 transform -rotate-90 mt-1">
+              <circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="7" fill="transparent" class="text-slate-200" />
+              <circle id="dash-phase-circle" cx="40" cy="40" r="32" stroke="currentColor" stroke-width="7" fill="transparent" class="text-[#4d81f7] circle-progress" stroke-linecap="round" />
+           </svg>
+           <span id="dash-phase-percent" class="absolute text-sm font-bold text-[#4d81f7] tracking-tight mt-1">18%</span>
+           <span class="absolute bottom-4 text-[10px] font-bold text-slate-400">Concluído</span>
+        </div>
+      </div>
+
+      <!-- Lista de Cards Reduzida -->
+      <div class="space-y-4 pr-1">
+        <!-- Card EcoSmile -->
+        <button onclick="irParaEcoSmile()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <h3 class="text-base font-bold text-brand-black tracking-tight">EcoSmile</h3>
+              <span class="bg-[#d1f0f0] text-[#296e6e] text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Novo</span>
+            </div>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Programa de Fidelidade e Reciclagem</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+          </div>
+        </button>
+
+        <!-- Card Descontos -->
+        <button onclick="irParaDescontos()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Meus Descontos</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Confira os itens resgatados e descontos</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= TELA ECOSMILE ================= -->
+    <div id="view-ecosmile" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Cabeçalho -->
+      <div class="flex items-center space-x-1 mb-5 mt-2">
+        <span class="text-3xl font-extrabold text-brand-emerald">eco</span>
+        <span class="text-3xl font-light text-brand-coral">smile</span>
+      </div>
+
+      <!-- Placar de Pontos com Ícone SVG -->
+      <div class="border-2 border-brand-peach bg-white rounded-[24px] p-5 mb-5 flex items-center justify-between shadow-sm">
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-[10px] font-extrabold text-brand-emerald uppercase tracking-widest block">Seu Saldo</span>
+            <button onclick="mostrarInfoPontos()" class="text-brand-emerald/60 hover:text-brand-coral transition-colors flex items-center justify-center focus:outline-none" aria-label="Informações sobre pontos">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v.01M12 12v4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-baseline space-x-1.5 mt-1">
+            <span id="user-points-display" class="text-4xl font-black text-brand-coral tracking-tighter leading-none">0</span>
+            <span class="text-xs font-bold text-brand-grey">pts</span>
+          </div>
+        </div>
+        <div class="w-12 h-12 bg-brand-lightCoral rounded-full flex items-center justify-center text-brand-coral">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+      </div>
+
+      <!-- Ações do Programa -->
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <button onclick="irParaRegistrarDevolucao()" class="w-full py-3.5 bg-brand-coral hover:bg-[#f58353] text-white rounded-2xl font-bold text-xs shadow-md transition-colors">
+          Registrar devolução
+        </button>
+        <button onclick="irParaLojinha()" class="w-full py-3.5 bg-white border-2 border-brand-peach text-brand-black hover:border-brand-coral rounded-2xl font-bold text-xs shadow-sm transition-colors">
+          Acessar lojinha
+        </button>
+      </div>
+
+      <div class="space-y-6 text-xs text-brand-black leading-relaxed border-t border-slate-100 pt-5">
+        
+        <div class="space-y-3 bg-brand-lightEmerald/30 p-5 rounded-[24px] border border-brand-emerald/10">
+          <h2 class="text-base font-bold text-brand-emerald tracking-tight">O que é a EcoSmile?</h2>
+          <p class="text-brand-black/80 font-medium">
+            A EcoSmile é uma iniciativa que visa o descarte correto de seus alinhadores. Ao participar você ajuda o meio ambiente e ganha pontos!
+          </p>
+          <button onclick="irParaImpacto()" class="w-full py-3 bg-white border border-brand-emerald text-brand-emerald hover:bg-brand-emerald hover:text-white rounded-full font-bold text-[11px] transition-colors shadow-sm">
+            Entenda nosso impacto
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <h2 class="text-base font-bold text-brand-black tracking-tight">Como preparar para descarte?</h2>
+          <p class="text-brand-black/80 font-medium">Seu alinhador precisa ser higienizado corretamente para descarte seguro.</p>
+          <button onclick="abrirPassosPreparo()" class="w-full py-3.5 border-2 border-brand-coral text-brand-coral hover:bg-brand-lightCoral/40 rounded-full font-bold text-sm transition-colors">
+            Ver passo a passo
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <h2 class="text-base font-bold text-brand-black tracking-tight">Onde posso descartar?</h2>
+          <p class="text-brand-black/80 font-medium">Veja as opções de descarte nas nossas unidades mais próximas de você.</p>
+          <div id="ecosmile-points-container" class="space-y-2.5">
+            <!-- Inserido dinamicamente -->
+          </div>
+        </div>
+
+        <!-- Histórico de Devoluções EcoSmile -->
+        <div class="space-y-3 pt-4 border-t border-slate-100">
+          <h2 class="text-base font-bold text-brand-black tracking-tight">Histórico de devoluções</h2>
+          <p class="text-brand-black/80 font-medium">Acompanhe os alinhadores que você já reciclou.</p>
+          <div id="ecosmile-historico-lista" class="space-y-2.5">
+            <!-- Inserido dinamicamente -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= TELA DE IMPACTO (Restaurada para o Design Original) ================= -->
+    <div id="view-impacto" class="view-transition px-6 flex-grow flex flex-col justify-start bg-slate-50 opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-5 mt-2">
+        <h1 class="text-[28px] font-extrabold text-brand-black tracking-tight leading-tight">Nosso Impacto</h1>
+        <p class="text-[11px] text-brand-grey mt-1.5 font-medium leading-relaxed">Entenda como seus alinhadores ganham um novo propósito com segurança.</p>
+      </div>
+
+      <!-- Alerta de Segurança MÁXIMA -->
+      <div class="bg-white p-5 rounded-[24px] border-2 border-brand-coral mb-6 shadow-sm relative overflow-hidden">
+          <div class="absolute -right-4 -top-4 w-16 h-16 bg-brand-lightCoral rounded-full opacity-50"></div>
+          <div class="flex items-center space-x-3 mb-2">
+             <div class="w-8 h-8 bg-brand-coral text-white rounded-full flex items-center justify-center flex-shrink-0 z-10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+             </div>
+             <h4 class="text-sm font-extrabold text-brand-black z-10">Não reutilizamos na saúde!</h4>
+          </div>
+          <p class="text-[11px] text-brand-black/80 font-medium leading-relaxed z-10 relative">
+              Fique tranquilo: <strong>nenhum alinhador volta para a boca de outro paciente</strong>. O material que você devolve é 100% triturado, descaracterizado e derretido em altas temperaturas para virar resina plástica comum.
+          </p>
+      </div>
+
+      <h3 class="text-[10px] font-extrabold text-brand-emerald uppercase tracking-widest pl-1 mb-3">O que eles viram?</h3>
+      <div class="space-y-3 mb-6">
+        <!-- Projeto 1 -->
+        <div class="bg-white p-4 rounded-[20px] border border-slate-100 shadow-sm flex items-center space-x-4">
+            <div class="text-3xl bg-slate-50 w-14 h-14 rounded-2xl flex items-center justify-center border border-slate-100 flex-shrink-0">🪴</div>
+            <div>
+                <h4 class="font-bold text-xs text-brand-black">Vasos Ecológicos</h4>
+                <p class="text-[10px] text-brand-grey font-medium mt-0.5">A resina derretida é injetada em moldes de jardinagem e paisagismo.</p>
+            </div>
+        </div>
+        <!-- Projeto 2 -->
+        <div class="bg-white p-4 rounded-[20px] border border-slate-100 shadow-sm flex items-center space-x-4">
+            <div class="text-3xl bg-slate-50 w-14 h-14 rounded-2xl flex items-center justify-center border border-slate-100 flex-shrink-0">📐</div>
+            <div>
+                <h4 class="font-bold text-xs text-brand-black">Material Escolar</h4>
+                <p class="text-[10px] text-brand-grey font-medium mt-0.5">A produção de réguas, esquadros e itens doados para escolas públicas.</p>
+            </div>
+        </div>
+      </div>
+
+      <h3 class="text-[10px] font-extrabold text-brand-emerald uppercase tracking-widest pl-1 mb-3">Nosso Marco</h3>
+      <!-- O Design de Cards Original que você pediu -->
+      <div class="grid grid-cols-2 gap-3 mt-2">
+        <!-- Card 1 -->
+        <div class="bg-white p-4 rounded-[24px] border-l-4 border-brand-emerald shadow-lg shadow-emerald-50/50 flex flex-col items-center text-center">
+            <span class="text-3xl mb-2">♻️</span>
+            <p class="text-xl font-black text-brand-emerald">5.000+</p>
+            <p class="text-[9px] text-stone-500 font-bold uppercase mt-1">Alinhadores transformados</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white p-4 rounded-[24px] border-l-4 border-brand-coral shadow-lg shadow-coral-50/50 flex flex-col items-center text-center">
+            <span class="text-3xl mb-2">🌍</span>
+            <p class="text-xl font-black text-brand-coral">1.2 T</p>
+            <p class="text-[9px] text-stone-500 font-bold uppercase mt-1">Redução de carbono</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TELA REGISTRAR DEVOLUÇÃO ================= -->
+    <div id="view-registrar-devolucao" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-4 mt-2">
+        <h1 class="text-[28px] font-extrabold text-brand-black tracking-tight leading-tight">Registrar devolução</h1>
+        <p class="text-[11px] text-brand-grey mt-1.5 font-medium leading-relaxed">Adicione os códigos impressos na embalagem dos alinhadores que você irá devolver.</p>
+      </div>
+
+      <!-- Seleção de Local da Devolução Obrigatória -->
+      <div class="space-y-1.5 mb-4">
+        <label class="text-[10px] font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Local de Entrega</label>
+        <select id="dev-local-select" class="w-full px-4 py-3.5 border-2 rounded-2xl text-xs font-bold bg-slate-50 input-field text-brand-black focus:bg-white focus:outline-none">
+          <option value="">Selecione uma unidade...</option>
+          <!-- Preenchido pelo JS com os pontos de coleta -->
+        </select>
+      </div>
+
+      <!-- Resumo do Perfil -->
+      <div class="bg-brand-lightEmerald/30 p-4 rounded-2xl border border-brand-emerald/20 mb-5 text-[11px]">
+         <p class="text-brand-emerald font-bold">
+           ⚠️ Você está na fase <span id="reg-current-phase" class="text-lg">3</span>. <br>
+           Só é permitido devolver alinhadores de fases <span class="underline">anteriores</span>.
+         </p>
+         <p class="text-brand-emerald mt-2 font-medium">Seu código base de paciente: <strong id="reg-patient-code" class="font-black text-sm">NDCW</strong></p>
+      </div>
+
+      <!-- Formulário de Adição Inteligente -->
+      <div class="space-y-4 mb-6">
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Adicionar Código</label>
+          <div class="flex space-x-2">
+            <input type="text" id="dev-codigo" placeholder="Ex: NDCW1S ou NDCW2I" class="w-full px-4 py-3 border-2 rounded-2xl text-sm font-bold bg-white input-field uppercase placeholder-slate-300">
+            <button onclick="adicionarAlinhador()" class="px-5 bg-brand-coral hover:bg-[#f58353] text-white rounded-2xl font-bold text-sm shadow-md transition-colors focus:outline-none">
+              +
+            </button>
+          </div>
+          <p id="dev-error" class="hidden text-[10px] font-bold text-red-500 pl-1 mt-1"></p>
+        </div>
+      </div>
+
+      <!-- Lista de Itens para Devolver -->
+      <div class="border-t border-slate-100 pt-4 flex-grow">
+        <div class="flex justify-between items-end mb-3 px-1">
+          <h2 class="text-xs font-bold text-brand-black uppercase tracking-wider">Itens Registrados</h2>
+          <span id="dev-total-pts" class="text-xs font-black text-brand-coral">0 pts</span>
+        </div>
+        
+        <div id="dev-list-container" class="space-y-2.5 min-h-[100px]">
+          <p class="text-xs text-brand-grey text-center py-4 font-medium">Nenhum código adicionado ainda.</p>
+        </div>
+      </div>
+
+      <div class="pt-6">
+        <button id="btnSubmitDevolucao" onclick="enviarDevolucao(event)" disabled class="w-full py-4 text-white font-bold text-sm rounded-full btn-pill shadow-md opacity-50 cursor-not-allowed">
+          Finalizar registro de devolução
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= TELA LOJINHA ================= -->
+    <div id="view-lojinha" class="view-transition px-6 flex-grow flex flex-col justify-start bg-slate-50 opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-4 mt-2">
+        <h1 class="text-3xl font-extrabold text-brand-black tracking-tight leading-tight">Lojinha EcoSmile</h1>
+      </div>
+      <div class="bg-brand-coral rounded-[24px] p-5 mb-6 text-white shadow-md flex justify-between items-center relative overflow-hidden">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+        <div class="relative z-10">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest block opacity-90">Seu Saldo Disponível</span>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span id="lojinha-points-display" class="text-3xl font-black tracking-tighter">0</span>
+            <span class="text-xs font-bold opacity-90">pts</span>
+          </div>
+        </div>
+        <svg class="w-10 h-10 opacity-80 relative z-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+      </div>
+      <div class="space-y-3">
+        <h2 class="text-[10px] font-bold text-brand-grey uppercase tracking-wider pl-1">Recompensas e Produtos</h2>
+        <div id="lojinha-produtos-container" class="space-y-3">
+          <!-- Inserido dinamicamente pelo JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TELA DE DESCONTOS E RESGATES ================= -->
+    <div id="view-descontos" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-6 mt-2">
+        <h1 class="text-3xl font-extrabold text-brand-black tracking-tight leading-tight">Meus descontos</h1>
+      </div>
+      
+      <!-- Estado Vazio Carinha Amigável -->
+      <div id="descontos-vazio" class="hidden flex-col items-center text-center justify-center py-10 px-4 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner">
+        <div class="text-5xl mb-4 drop-shadow-sm">😊</div>
+        <h3 class="text-base font-bold text-brand-black tracking-tight mb-2">Poxa, sem descontos por aqui.</h3>
+        <p class="text-xs text-brand-grey font-medium leading-relaxed mb-6">Continue cuidando do seu sorriso. Em breve teremos surpresas incríveis pra você!</p>
+        <button onclick="irParaLojinha()" class="px-6 py-3 bg-white border-2 border-brand-peach hover:border-brand-coral text-brand-coral rounded-full font-bold text-xs shadow-sm transition-all">
+          Ir para Lojinha
+        </button>
+      </div>
+
+      <!-- Lista de Descontos Ativos -->
+      <div id="descontos-container" class="space-y-4">
+        <!-- Inserido dinamicamente -->
+      </div>
+
+      <!-- Histórico de Resgates Separado -->
+      <div id="historico-resgates-container" class="mt-8 hidden">
+        <h2 class="text-[10px] font-extrabold text-brand-emerald uppercase tracking-widest pl-1 mb-3">Histórico de Resgates</h2>
+        <div id="historico-resgates-lista" class="space-y-3">
+          <!-- Inserido dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PAINEL ADMINISTRATIVO (DASHBOARD) ================= -->
+    <div id="view-admin-dashboard" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-8 overflow-y-auto no-scrollbar pb-8">
+      <div class="flex justify-between items-start mb-8 mt-3">
+        <div class="space-y-0.5">
+          <span class="text-lg font-medium text-brand-grey tracking-tight block">Bem-vindo,</span>
+          <h1 class="text-4xl font-extrabold text-brand-coral tracking-tight leading-none">Administrador</h1>
+        </div>
+        <button onclick="sairDaConta()" class="flex items-center space-x-1.5 text-brand-grey hover:text-red-500 transition-colors py-2 px-2.5 -mr-2 rounded-2xl hover:bg-slate-50 active:scale-95 focus:outline-none"><span class="text-xs font-bold uppercase tracking-wider">Sair</span><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
+      </div>
+      <div class="space-y-4">
+        
+        <button onclick="irParaConfigurarPontosAdmin()" class="w-full text-left p-5 border border-brand-blue/30 bg-blue-50/50 rounded-[24px] hover:bg-blue-50 transition-all active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-blue tracking-tight">Configurar Pontos</h3>
+            <p class="text-[11px] text-brand-blue/70 font-medium leading-relaxed">Definir valor de cada alinhador devolvido</p>
+          </div>
+          <div class="text-brand-blue group-hover:translate-x-1 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+        </button>
+
+        <button onclick="irParaCriarDescontoAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar desconto</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Criar desconto e enviar para a Lojinha</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></div>
+        </button>
+        <button onclick="irParaCriarPontoAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar ponto de coleta</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Nova unidade para receber alinhadores</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></div>
+        </button>
+        <button onclick="irParaCriarProdutoAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar produto físico</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Criar recompensa (com foto) para Lojinha</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ADMIN TELAS FORMS -->
+    <div id="view-admin-config-pontos" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-blue uppercase tracking-widest text-left block">Sistema</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">Regra de Pontos</h1>
+      </div>
+      <form class="space-y-5" onsubmit="salvarConfigPontos(event)">
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Valor por Alinhador (Pts)</label>
+            <input type="number" id="admin-config-pts" required min="1" class="w-full px-5 py-4 border-2 border-brand-blue/30 focus:border-brand-blue rounded-3xl text-lg font-black bg-white focus:outline-none transition-colors text-center text-brand-blue">
+          </div>
+          <p class="text-[10px] text-brand-grey text-center leading-relaxed">Este valor será creditado na conta do paciente para CADA alinhador (superior ou inferior) que ele devolver.</p>
+        </div>
+        <button type="submit" class="w-full py-4 bg-brand-blue hover:bg-blue-600 text-white font-bold text-lg rounded-full shadow-md mt-4 transition-colors">Salvar Configuração</button>
+      </form>
+    </div>
+
+    <div id="view-admin-criar-desconto" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">Criar desconto</h1>
+      </div>
+      <form id="adminCriarDescontoForm" class="space-y-5" onsubmit="criarNovoDescontoAdmin(event)">
+        <div class="space-y-4">
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Título</label><input type="text" id="admin-discount-title" required class="w-full px-5 py-4 border-2 rounded-3xl text-sm bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Valor Desconto (%)</label><input type="number" id="admin-discount-value" min="1" max="100" required class="w-full px-5 py-4 border-2 rounded-3xl text-sm bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Custo (Pontos)</label><input type="number" id="admin-discount-cost" min="0" required class="w-full px-5 py-4 border-2 rounded-3xl text-sm bg-white input-field"></div>
+        </div>
+        <button type="submit" class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill shadow-md mt-4">Adicionar à Lojinha</button>
+      </form>
+    </div>
+
+    <div id="view-admin-criar-ponto" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">Criar ponto</h1>
+      </div>
+      <form id="adminCriarPontoForm" class="space-y-5 text-xs font-semibold" onsubmit="criarNovoPontoAdmin(event)">
+        <div class="space-y-4">
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Nome da Unidade</label><input type="text" id="admin-point-name" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Endereço</label><input type="text" id="admin-point-address" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Horário</label><input type="text" id="admin-point-hours" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm bg-white input-field"></div>
+        </div>
+        <button type="submit" class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill shadow-md mt-4">Criar Local</button>
+      </form>
+    </div>
+
+    <div id="view-admin-criar-produto" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">Novo Produto</h1>
+      </div>
+      <form id="adminCriarProdutoForm" class="space-y-5 text-xs font-semibold" onsubmit="criarNovoProdutoAdmin(event)">
+        <div class="space-y-4">
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Nome do Produto</label><input type="text" id="admin-prod-name" placeholder="Ex: Kit Clareamento" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm font-medium bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Descrição</label><input type="text" id="admin-prod-desc" placeholder="Breve descrição" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm font-medium bg-white input-field"></div>
+          <div class="space-y-1.5"><label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Custo (Pontos)</label><input type="number" id="admin-prod-pts" placeholder="Ex: 1000" required class="w-full px-5 py-3.5 border-2 rounded-3xl text-sm font-medium bg-white input-field"></div>
+          
+          <!-- Upload de Imagem -->
+          <div class="space-y-1.5 pt-2">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Foto do Produto (Opcional)</label>
+            <div class="flex items-center justify-center w-full">
+                <label for="admin-prod-img" class="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-200 border-dashed rounded-3xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-6 h-6 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L28 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="text-[10px] text-slate-500 font-bold" id="admin-prod-img-text">Clique para escolher foto</p>
+                    </div>
+                    <input id="admin-prod-img" type="file" accept="image/*" class="hidden" onchange="previewNomeArquivo(this)" />
+                </label>
+            </div>
+          </div>
+
+        </div>
+        <button type="submit" class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill shadow-md mt-4">Cadastrar Produto</button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Modais -->
+  <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border border-slate-100">
+      <h3 id="modalTitle" class="text-lg font-bold text-brand-black">Ação Concluída</h3>
+      <p id="modalDesc" class="text-sm text-brand-grey mt-2">Sucesso na operação.</p>
+      <button onclick="fecharModal()" class="mt-5 px-6 py-3 bg-brand-coral text-white rounded-full font-bold text-sm hover:bg-[#f58353] transition-colors w-full focus:outline-none">Ok, continuar</button>
+    </div>
+  </div>
+
+  <div id="preparoModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full shadow-2xl border border-slate-100 relative">
+      <h3 class="text-xl font-extrabold text-brand-black tracking-tight mb-4">Passos para Descarte</h3>
+      <div class="space-y-4 text-xs font-semibold text-brand-black/90">
+        <div class="flex items-start space-x-3"><span class="w-6 h-6 bg-brand-lightCoral text-brand-coral rounded-full flex items-center justify-center flex-shrink-0">1</span><p class="pt-0.5 leading-relaxed">Lave bem seus alinhadores antigos com sabão neutro e água corrente.</p></div>
+        <div class="flex items-start space-x-3"><span class="w-6 h-6 bg-brand-lightCoral text-brand-coral rounded-full flex items-center justify-center flex-shrink-0">2</span><p class="pt-0.5 leading-relaxed">Seque totalmente para evitar microorganismos.</p></div>
+        <div class="flex items-start space-x-3"><span class="w-6 h-6 bg-brand-lightCoral text-brand-coral rounded-full flex items-center justify-center flex-shrink-0">3</span><p class="pt-0.5 leading-relaxed">Insira na embalagem e entregue na recepção com seus códigos gerados!</p></div>
+      </div>
+      <button onclick="fecharPreparo()" class="mt-6 w-full py-3.5 bg-brand-coral text-white rounded-full font-bold text-sm shadow-md">Entendi</button>
+    </div>
+  </div>
+
+  <div id="infoPontosModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full shadow-2xl border border-slate-100 relative text-center">
+      <div class="w-16 h-16 bg-brand-lightEmerald rounded-full flex items-center justify-center text-brand-emerald mx-auto mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      </div>
+      <h3 class="text-xl font-extrabold text-brand-black tracking-tight mb-2">Regra de Pontuação</h3>
+      <p class="text-xs font-semibold text-brand-grey leading-relaxed">
+        Cada alinhador (superior ou inferior) que você devolve na unidade vale exatamente <br>
+        <strong class="text-brand-emerald text-base"><span id="modal-pts-val">50</span> pontos virtuais</strong>.
+      </p>
+      <button onclick="fecharInfoPontos()" class="mt-6 w-full py-3.5 bg-brand-emerald text-white rounded-full font-bold text-sm shadow-md hover:bg-[#1e5252]">Entendi!</button>
+    </div>
+  </div>
+
+  <script>
+    // ================= VARIÁVEIS GLOBAIS DE SISTEMA =================
+    let ptsPorDevolucao = 50; // Configurável pelo Admin
+
+    // Perfil Inicial para Testes (Felipe)
+    let patientProfile = {
+      name: 'Felipe',
+      code: 'NDCW',
+      currentPhase: 3,
+      totalPhases: 17,
+      points: 5000, // Pontos iniciais para teste da Lojinha
+      resgatados: [] // IDs de produtos resgatados (Para desativar botão)
+    };
+    
+    let devolucaoList = [];
+    let historicoGlobalDevolucoes = [];
+    let historicoResgates = []; // O que o usuário pegou na lojinha
+
+    // Lojinha Base (Produtos físicos e Descontos)
+    let lojinhaProdutos = [
+      { id: 'prod-desc-1', nome: '15% Off Manutenção', desc: 'Aplicável na próxima visita', pts: 500, tipo: 'desconto' },
+      { id: 'prod-fis-1', nome: 'Escova Ecológica Bamboo', desc: 'Brinde exclusivo sustentável', pts: 800, tipo: 'produto' },
+      { id: 'prod-fis-2', nome: 'Kit Clareamento Caseiro', desc: 'Seringas extras para manutenção', pts: 2500, tipo: 'produto' }
+    ];
+
+    let pontosColeta = [
+      { id: 'p1', nome: 'Unidade Paulista', endereco: 'Av. Exemplo, 1245', horas: '08:00 às 20:00' },
+      { id: 'p2', nome: 'Unidade Pinheiros', endereco: 'Rua Nova, 872', horas: '09:00 às 18:00' }
+    ];
+
+    // ================= INICIALIZAÇÃO =================
+    window.onload = function() {
+      atualizarInterfacePerfil();
+      renderizarPontosColetaEco();
+      renderizarSelectLocais();
+      renderizarLojinha();
+      renderizarListaDevolucao();
+      renderizarDescontosCliente();
+      renderizarHistoricoEcoSmile();
+      document.getElementById('admin-config-pts').value = ptsPorDevolucao;
+    };
+
+    // ================= PERFIL E PONTOS =================
+    function atualizarInterfacePerfil() {
+      const homeName = document.getElementById('home-user-name');
+      const homeCode = document.getElementById('home-patient-code');
+      const regCode = document.getElementById('reg-patient-code');
+      const regPhase = document.getElementById('reg-current-phase');
+      const dashPhase = document.getElementById('dash-phase');
+      const dashPhaseNum = document.getElementById('dash-phase-num');
+      
+      if (homeName) homeName.innerText = patientProfile.name;
+      if (homeCode) homeCode.innerText = patientProfile.code;
+      if (regCode) regCode.innerText = patientProfile.code;
+      if (regPhase) regPhase.innerText = patientProfile.currentPhase;
+      if (dashPhase) dashPhase.innerText = `${patientProfile.currentPhase}/${patientProfile.totalPhases}`;
+      if (dashPhaseNum) dashPhaseNum.innerText = patientProfile.currentPhase;
+
+      const dashCircle = document.getElementById('dash-phase-circle');
+      const dashPercentText = document.getElementById('dash-phase-percent');
+      
+      if (dashCircle && dashPercentText) {
+        const circumference = 201; // Ajustado para r=32 (2 * pi * 32)
+        dashCircle.style.strokeDasharray = circumference;
+        const percent = Math.round((patientProfile.currentPhase / patientProfile.totalPhases) * 100);
+        const offset = circumference - (circumference * percent / 100);
+        dashPercentText.innerText = `${percent}%`;
+        setTimeout(() => { dashCircle.style.strokeDashoffset = offset; }, 150);
+      }
+      atualizarPontosVisuais();
+    }
+
+    function atualizarPontosVisuais() {
+      const displayEco = document.getElementById('user-points-display');
+      const displayLojinha = document.getElementById('lojinha-points-display');
+      const strPts = patientProfile.points.toLocaleString('pt-BR');
+      if (displayEco) displayEco.innerText = strPts;
+      if (displayLojinha) displayLojinha.innerText = strPts;
+      document.getElementById('modal-pts-val').innerText = ptsPorDevolucao;
+    }
+
+    // ================= LÓGICA DE VALIDAÇÃO DE DEVOLUÇÃO =================
+    function adicionarAlinhador() {
+      const inputEl = document.getElementById('dev-codigo');
+      const errorEl = document.getElementById('dev-error');
+      const val = inputEl.value.trim().toUpperCase();
+
+      if(errorEl) errorEl.classList.add('hidden');
+      if (!val) return;
+
+      const regex = new RegExp(`^${patientProfile.code}(\\d+)([SI])$`);
+      const match = val.match(regex);
+
+      if (!match) {
+        if(errorEl) { errorEl.innerText = `Formato inválido. Ex: ${patientProfile.code}1S ou ${patientProfile.code}2I`; errorEl.classList.remove('hidden'); }
+        return;
+      }
+
+      const phase = parseInt(match[1]);
+      const type = match[2];
+
+      if (phase >= patientProfile.currentPhase) {
+        if(errorEl) { errorEl.innerText = `Bloqueado: Devolva apenas fases anteriores a atual.`; errorEl.classList.remove('hidden'); }
+        return;
+      }
+
+      if (devolucaoList.some(item => item.code === val) || historicoGlobalDevolucoes.some(item => item.code === val)) {
+        if(errorEl) { errorEl.innerText = `Código já registrado.`; errorEl.classList.remove('hidden'); }
+        return;
+      }
+
+      devolucaoList.push({ code: val, phase: phase, type: type });
+      inputEl.value = '';
+      renderizarListaDevolucao();
+    }
+
+    function removerAlinhador(index) {
+      devolucaoList.splice(index, 1);
+      renderizarListaDevolucao();
+    }
+
+    function renderizarListaDevolucao() {
+      const container = document.getElementById('dev-list-container');
+      const totalPtsEl = document.getElementById('dev-total-pts');
+      const btnSubmit = document.getElementById('btnSubmitDevolucao');
+
+      if(!container) return;
+      container.innerHTML = '';
+      let ptsGanhar = 0;
+
+      if (devolucaoList.length === 0) {
+        container.innerHTML = '<p class="text-[11px] text-brand-grey text-center py-4 font-medium">Nenhum código adicionado ainda.</p>';
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        devolucaoList.forEach((item, index) => {
+          ptsGanhar += ptsPorDevolucao; 
+          const el = document.createElement('div');
+          el.className = "flex justify-between items-center bg-slate-50 border border-slate-100 p-3.5 rounded-[16px] animate-fade-in";
+          const typeLabel = item.type === 'S' ? 'Sup' : 'Inf';
+          
+          el.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <span class="w-9 h-9 rounded-full bg-brand-lightEmerald text-brand-emerald flex items-center justify-center font-bold text-[10px]">${typeLabel}</span>
+              <div>
+                <p class="font-extrabold text-xs text-brand-black tracking-wide">${item.code}</p>
+                <p class="text-[10px] text-brand-grey font-medium mt-0.5">Pertence à Fase ${item.phase}</p>
+              </div>
+            </div>
+            <button type="button" onclick="removerAlinhador(${index})" class="text-red-400 hover:text-red-600 focus:outline-none p-2 bg-white rounded-full shadow-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          `;
+          container.appendChild(el);
+        });
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+      totalPtsEl.innerText = `+${ptsGanhar} pts`;
+    }
+
+    function enviarDevolucao(event) {
+      event.preventDefault();
+      const localSelecionado = document.getElementById('dev-local-select').value;
+      
+      if (!localSelecionado) {
+          simularAcao('Atenção', 'Você deve selecionar o Local de Entrega antes de finalizar.');
+          return;
+      }
+      if (devolucaoList.length === 0) return;
+
+      const ptsGanhos = devolucaoList.length * ptsPorDevolucao;
+      patientProfile.points += ptsGanhos;
+      
+      const dataHoje = new Date().toLocaleDateString('pt-BR');
+      devolucaoList.forEach(item => {
+        historicoGlobalDevolucoes.push({ code: item.code, phase: item.phase, type: item.type, pts: ptsPorDevolucao, data: dataHoje });
+      });
+
+      devolucaoList = [];
+      document.getElementById('dev-local-select').value = '';
+      
+      renderizarListaDevolucao();
+      atualizarPontosVisuais();
+      renderizarLojinha(); 
+      renderizarHistoricoEcoSmile();
+
+      simularAcao('Devolução Registrada!', `Você acaba de ganhar +${ptsGanhos} pontos! Apresente seus alinhadores higienizados na recepção da unidade escolhida.`);
+    }
+
+    // ================= LÓGICA DA LOJINHA ECOSMILE (COM ESPAÇAMENTO REFINADO) =================
+    function renderizarLojinha() {
+      const container = document.getElementById('lojinha-produtos-container');
+      if(!container) return;
+      container.innerHTML = '';
+      
+      lojinhaProdutos.forEach(p => {
+        const jaResgatou = patientProfile.resgatados.includes(p.id);
+        const canAfford = patientProfile.points >= p.pts;
+        
+        let btnClass, btnAction, btnText;
+
+        if (jaResgatou) {
+            btnClass = 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200';
+            btnAction = 'disabled';
+            btnText = 'Já resgatado';
+        } else if (canAfford) {
+            btnClass = 'bg-brand-emerald text-white hover:bg-[#1e5252] shadow-sm active:scale-95';
+            btnAction = `onclick="resgatarProduto('${p.id}', '${p.nome}', ${p.pts}, '${p.tipo}')"`;
+            btnText = 'Resgatar';
+        } else {
+            btnClass = 'bg-slate-200 text-slate-400 cursor-not-allowed';
+            btnAction = 'disabled';
+            btnText = 'Pontos insuficientes';
+        }
+        
+        const badgeColor = p.tipo === 'desconto' ? 'bg-brand-lightCoral text-brand-coral' : 'bg-[#d1f0f0] text-[#296e6e]';
+        const badgeIcon = p.tipo === 'desconto' ? '🎫' : '🎁';
+
+        const card = document.createElement('div');
+        // Espaçamento ajustado para p-5 como solicitado!
+        card.className = "bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm flex flex-col space-y-3 relative overflow-hidden";
+        
+        let imageHTML = '';
+        if(p.image) {
+            imageHTML = `<div class="w-full h-32 rounded-[16px] bg-slate-50 overflow-hidden mb-1 border border-slate-100"><img src="${p.image}" class="w-full h-full object-cover"></div>`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center space-x-1.5 self-start px-2 py-1 rounded-full ${badgeColor} text-[9px] font-extrabold uppercase tracking-widest mb-1">
+             <span>${badgeIcon}</span> <span>${p.tipo}</span>
+          </div>
+          ${imageHTML}
+          <div class="flex justify-between items-end">
+            <div class="pr-2">
+              <h4 class="font-bold text-brand-black text-[13px] tracking-tight leading-tight">${p.nome}</h4>
+              <p class="text-[10px] text-brand-grey mt-1 font-medium leading-relaxed">${p.desc}</p>
+              <p class="text-sm font-black text-brand-coral mt-2">${p.pts.toLocaleString('pt-BR')} pts</p>
+            </div>
+            <button ${btnAction} class="px-4 py-2.5 rounded-full font-bold text-[10px] transition-colors whitespace-nowrap flex-shrink-0 ${btnClass}">
+              ${btnText}
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function resgatarProduto(id, nome, custo, tipo) {
+      if(patientProfile.points >= custo) {
+        patientProfile.points -= custo;
+        patientProfile.resgatados.push(id); 
+        historicoResgates.push({ nome, data: new Date().toLocaleDateString('pt-BR'), tipo });
+        
+        atualizarPontosVisuais();
+        renderizarLojinha();
+        renderizarDescontosCliente(); 
+        simularAcao('Resgate Realizado!', `Você usou ${custo} pontos em "${nome}". Ele foi salvo na sua aba de Descontos!`);
+      }
+    }
+
+    // ================= RENDERIZADORES E TELAS =================
+    function renderizarPontosColetaEco() {
+      const c = document.getElementById('ecosmile-points-container');
+      if(!c) return;
+      c.innerHTML = '';
+      pontosColeta.forEach(p => {
+        const div = document.createElement('div');
+        div.className = "p-4 border border-brand-peach rounded-[20px] bg-white flex items-center space-x-3";
+        div.innerHTML = `
+          <svg class="w-5 h-5 text-brand-coral" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <div><h4 class="font-bold text-xs text-brand-black">${p.nome}</h4><p class="text-[10px] text-brand-grey">${p.endereco} • ${p.horas}</p></div>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    function renderizarSelectLocais() {
+      const sel = document.getElementById('dev-local-select');
+      if(!sel) return;
+      sel.innerHTML = '<option value="">Selecione uma unidade...</option>';
+      pontosColeta.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.nome;
+          opt.innerText = p.nome;
+          sel.appendChild(opt);
+      });
+    }
+
+    function renderizarHistoricoEcoSmile() {
+      const c = document.getElementById('ecosmile-historico-lista');
+      if(!c) return;
+      c.innerHTML = '';
+      if(historicoGlobalDevolucoes.length === 0) {
+        c.innerHTML = '<p class="text-[11px] text-brand-grey text-center py-3 bg-slate-50 rounded-2xl border border-slate-100">Nenhuma devolução registrada ainda.</p>';
+      } else {
+        [...historicoGlobalDevolucoes].reverse().forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center bg-slate-50 p-3.5 rounded-[16px] border border-slate-100 shadow-sm";
+          div.innerHTML = `
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-brand-lightEmerald text-brand-emerald flex items-center justify-center font-bold text-[10px]">${item.type === 'S' ? 'Sup' : 'Inf'}</span>
+              <div>
+                <p class="font-bold text-xs text-brand-black">${item.code}</p>
+                <p class="text-[9px] text-brand-grey font-medium">${item.data} - Pertence à Fase ${item.phase}</p>
+              </div>
+            </div>
+            <span class="text-xs font-black text-brand-coral">+${item.pts} pts</span>
+          `;
+          c.appendChild(div);
+        });
+      }
+    }
+
+    function renderizarDescontosCliente() {
+      const emptyState = document.getElementById('descontos-vazio');
+      const containerAtivos = document.getElementById('descontos-container');
+      const historyContainer = document.getElementById('historico-resgates-container');
+      const historyList = document.getElementById('historico-resgates-lista');
+      
+      if(!containerAtivos || !emptyState || !historyList) return;
+      
+      containerAtivos.innerHTML = '';
+      historyList.innerHTML = '';
+
+      // Mostra apenas itens que foram resgatados na Lojinha e são cupons ativos (Se quisermos lógica complexa)
+      // Para simular, vamos listar os descontos ativos (Nenhum por padrão como pedido)
+      const ativos = []; 
+      
+      if (ativos.length === 0 && historicoResgates.length === 0) {
+          emptyState.classList.remove('hidden');
+          emptyState.classList.add('flex');
+          historyContainer.classList.add('hidden');
+      } else {
+          emptyState.classList.add('hidden');
+          emptyState.classList.remove('flex');
+          
+          if(historicoResgates.length > 0) {
+              historyContainer.classList.remove('hidden');
+              [...historicoResgates].reverse().forEach(item => {
+                  const el = document.createElement('div');
+                  el.className = "flex justify-between items-center bg-slate-50 p-4 rounded-[20px] border border-slate-100";
+                  const icon = item.tipo === 'desconto' ? '🎫' : '🎁';
+                  el.innerHTML = `
+                      <div class="flex items-center space-x-3">
+                          <span class="text-xl">${icon}</span>
+                          <div>
+                              <p class="font-bold text-xs text-brand-black">${item.nome}</p>
+                              <p class="text-[9px] text-brand-grey font-medium">Resgatado em ${item.data}</p>
+                          </div>
+                      </div>
+                      <span class="bg-brand-lightEmerald text-brand-emerald text-[8px] font-bold px-2 py-1 rounded-full uppercase">Pronto para uso</span>
+                  `;
+                  historyList.appendChild(el);
+              });
+          }
+      }
+    }
+
+    // ================= NAVEGAÇÃO =================
+    function transicionarTelas(origemId, destinoId, viewNome) {
+      const origem = document.getElementById(origemId);
+      const destino = document.getElementById(destinoId);
+      const backButton = document.getElementById('header-back-button');
+
+      if (viewNome === 'home' || viewNome === 'admin-dashboard' || viewNome === 'login') {
+        if(backButton) backButton.style.visibility = 'hidden';
+      } else {
+        if(backButton) backButton.style.visibility = 'visible';
+      }
+
+      if (origem) origem.classList.add('opacity-0');
+      
+      setTimeout(() => {
+        if (origem) origem.classList.add('hidden');
+        if (destino) {
+          destino.classList.remove('hidden');
+          void destino.offsetWidth; 
+          setTimeout(() => {
+            destino.classList.remove('opacity-0', 'translate-x-8');
+            destino.classList.add('opacity-100', 'translate-x-0');
+          }, 50);
+        }
+      }, 200);
+    }
+
+    function obterViewAtiva() {
+      const views = ['registrar-devolucao', 'lojinha', 'ecosmile', 'impacto', 'home', 'login', 'admin-dashboard', 'descontos', 'admin-criar-desconto', 'admin-criar-ponto', 'admin-criar-produto', 'admin-config-pontos', 'cadastro', 'recuperar'];
+      for(let view of views) {
+        const el = document.getElementById(`view-${view}`);
+        if (el && !el.classList.contains('hidden')) return view;
+      }
+      return 'login';
+    }
+
+    function voltarParaAnterior() {
+      const activeView = obterViewAtiva();
+      if (['registrar-devolucao', 'lojinha', 'impacto'].includes(activeView)) irParaEcoSmile();
+      else if (['ecosmile', 'descontos'].includes(activeView)) irParaHome();
+      else if (['admin-criar-desconto', 'admin-criar-ponto', 'admin-criar-produto', 'admin-config-pontos'].includes(activeView)) transicionarTelas(`view-${activeView}`, 'view-admin-dashboard', 'admin-dashboard');
+      else irParaLogin();
+    }
+
+    function irParaLogin() { transicionarTelas(`view-${obterViewAtiva()}`, 'view-login', 'login'); }
+    function irParaCadastro() { transicionarTelas('view-login', 'view-cadastro', 'cadastro'); }
+    function irParaRecuperar() { 
+      resgatarFormularioRecuperacao();
+      const emailLogin = document.getElementById('login-email').value;
+      if (emailLogin) document.getElementById('recuperar-email').value = emailLogin;
+      transicionarTelas('view-login', 'view-recuperar', 'recuperar'); 
+    }
+    function irParaHome() { transicionarTelas(`view-${obterViewAtiva()}`, 'view-home', 'home'); }
+    function irParaEcoSmile() { transicionarTelas(`view-${obterViewAtiva()}`, 'view-ecosmile', 'ecosmile'); }
+    function irParaImpacto() { transicionarTelas('view-ecosmile', 'view-impacto', 'impacto'); }
+    
+    function irParaRegistrarDevolucao() { 
+      devolucaoList = []; 
+      renderizarListaDevolucao();
+      transicionarTelas('view-ecosmile', 'view-registrar-devolucao', 'registrar-devolucao'); 
+    }
+    
+    function irParaLojinha() { transicionarTelas(`view-${obterViewAtiva()}`, 'view-lojinha', 'lojinha'); }
+    function irParaDescontos() { transicionarTelas(`view-${obterViewAtiva()}`, 'view-descontos', 'descontos'); }
+
+    function irParaConfigurarPontosAdmin() { document.getElementById('admin-config-pts').value = ptsPorDevolucao; transicionarTelas('view-admin-dashboard', 'view-admin-config-pontos', 'admin-config-pontos'); }
+    function irParaCriarDescontoAdmin() { document.getElementById('adminCriarDescontoForm').reset(); transicionarTelas('view-admin-dashboard', 'view-admin-criar-desconto', 'admin-criar-desconto'); }
+    function irParaCriarPontoAdmin() { document.getElementById('adminCriarPontoForm').reset(); transicionarTelas('view-admin-dashboard', 'view-admin-criar-ponto', 'admin-criar-ponto'); }
+    function irParaCriarProdutoAdmin() { 
+        document.getElementById('adminCriarProdutoForm').reset(); 
+        adminTempImage = null; 
+        document.getElementById('admin-prod-img-text').innerText = "Clique para escolher foto";
+        transicionarTelas('view-admin-dashboard', 'view-admin-criar-produto', 'admin-criar-produto'); 
+    }
+
+    // ================= RECUPERAÇÃO DE SENHA =================
+    function executarRecuperacao(event) {
+      event.preventDefault();
+      const emailDigitado = document.getElementById('recuperar-email').value;
+      const btnSubmit = document.getElementById('btnSubmitRecuperar');
+      
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `
+        <span class="inline-flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Enviando...
+        </span>
+      `;
+
+      setTimeout(() => {
+        document.getElementById('email-obfuscado').innerText = ofuscarEmail(emailDigitado);
+        document.getElementById('recuperar-logo').classList.add('hidden');
+        document.getElementById('recuperar-estado-formulario').classList.add('hidden');
+        document.getElementById('recuperar-estado-sucesso').classList.remove('hidden');
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = 'Enviar e-mail de recuperação';
+      }, 950);
+    }
+
+    function ofuscarEmail(email) {
+      if (!email || !email.includes('@')) return 'l********@gmail.com';
+      const [local, dominio] = email.split('@');
+      if (local.length <= 2) return local[0] + '***@' + dominio;
+      return local[0] + '*'.repeat(Math.min(8, local.length - 2)) + local[local.length - 1] + '@' + dominio;
+    }
+
+    function resgatarFormularioRecuperacao() {
+      document.getElementById('recuperar-logo').classList.remove('hidden');
+      document.getElementById('recuperar-estado-formulario').classList.remove('hidden');
+      document.getElementById('recuperar-estado-sucesso').classList.add('hidden');
+    }
+
+    function resetarERetornarLogin() {
+      document.getElementById('recuperar-email').value = '';
+      resgatarFormularioRecuperacao();
+      irParaLogin();
+    }
+
+    // ================= LOGIN SIMPLIFICADO =================
+    function executarLogin(event) {
+      event.preventDefault();
+      const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+      
+      if (emailInput === 'admin@sousmile.com') {
+          transicionarTelas('view-login', 'view-admin-dashboard', 'admin-dashboard');
+      } else {
+          const nomeExtraido = emailInput.split('@')[0];
+          const nomeFormatado = nomeExtraido.charAt(0).toUpperCase() + nomeExtraido.slice(1).toLowerCase();
+          patientProfile.name = nomeFormatado;
+          atualizarInterfacePerfil();
+          transicionarTelas('view-login', 'view-home', 'home');
+      }
+      document.getElementById('loginForm').reset();
+    }
+    
+    function executarCadastro(event) {
+      event.preventDefault();
+      const nomeInput = document.getElementById('cadastro-nome').value;
+      if (nomeInput) {
+        const primeiroNome = nomeInput.trim().split(' ')[0];
+        const nomeFormatado = primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase();
+        patientProfile.name = nomeFormatado;
+        atualizarInterfacePerfil();
+      }
+      simularAcao('Cadastro Realizado!', 'A sua conta foi criada com sucesso.');
+    }
+
+    function sairDaConta() { irParaLogin(); }
+
+    function simularAcao(titulo, desc) {
+      document.getElementById('modalTitle').innerText = titulo;
+      document.getElementById('modalDesc').innerText = desc || "Ação concluída.";
+      const m = document.getElementById('successModal');
+      if(m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+    
+    function fecharModal() {
+      const m = document.getElementById('successModal');
+      if(m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+      const av = obterViewAtiva();
+      if(av === 'registrar-devolucao' && devolucaoList.length === 0) irParaEcoSmile(); 
+      if(av === 'cadastro') irParaLogin();
+      if(av === 'admin-criar-desconto' || av === 'admin-criar-ponto' || av === 'admin-criar-produto') voltarParaAnterior();
+    }
+
+    function abrirPassosPreparo() {
+      const m = document.getElementById('preparoModal');
+      if(m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+    function fecharPreparo() {
+      const m = document.getElementById('preparoModal');
+      if(m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    }
+    function mostrarInfoPontos() {
+      const m = document.getElementById('infoPontosModal');
+      if(m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+    function fecharInfoPontos() {
+      const m = document.getElementById('infoPontosModal');
+      if(m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+    }
+
+    function togglePassword(inputId, openIconId, closedIconId) {
+      const passwordInput = document.getElementById(inputId);
+      const eyeOpen = document.getElementById(openIconId);
+      const eyeClosed = document.getElementById(closedIconId);
+      if (passwordInput && eyeOpen && eyeClosed) {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeOpen.classList.add('hidden');
+          eyeClosed.classList.remove('hidden');
+        } else {
+          passwordInput.type = 'password';
+          eyeOpen.classList.remove('hidden');
+          eyeClosed.classList.add('hidden');
+        }
+      }
+    }
+
+    function baixarComoPNG() { simularAcao('Função de Exportação', 'A tela atual será salva no seu dispositivo.'); }
+
+    // ================= AÇÕES ADMIN =================
+    function salvarConfigPontos(event) {
+        event.preventDefault();
+        ptsPorDevolucao = parseInt(document.getElementById('admin-config-pts').value);
+        atualizarPontosVisuais(); // Atualiza o placar
+        simularAcao('Configuração Salva!', `A partir de agora cada alinhador devolvido valerá ${ptsPorDevolucao} pontos.`);
+        voltarParaAnterior();
+    }
+
+    function criarNovoDescontoAdmin(event) {
+      event.preventDefault();
+      const titulo = document.getElementById('admin-discount-title').value.trim();
+      const pts = parseInt(document.getElementById('admin-discount-cost').value);
+      lojinhaProdutos.unshift({ id: `dyn-desc-${Date.now()}`, nome: titulo, desc: 'Desconto aplicável em unidades', pts: pts, tipo: 'desconto' });
+      renderizarLojinha();
+      simularAcao("Desconto na Lojinha!", `O desconto "${titulo}" já está disponível para resgate por ${pts} pontos.`);
+    }
+
+    function criarNovoPontoAdmin(event) {
+      event.preventDefault();
+      const nome = document.getElementById('admin-point-name').value.trim();
+      const endereco = document.getElementById('admin-point-address').value.trim();
+      const horas = document.getElementById('admin-point-hours').value.trim();
+      pontosColeta.push({ id: `dynamic-ponto-${Date.now()}`, nome: nome, endereco: endereco, horas: horas });
+      renderizarPontosColetaEco();
+      renderizarSelectLocais(); // Atualiza o select de devolução
+      simularAcao("Ponto Ativado!", `O ponto "${nome}" foi cadastrado para coleta.`);
+    }
+
+    // Variável para armazenar base64 temporário da imagem
+    let adminTempImage = null;
+    function previewNomeArquivo(input) {
+        const textLabel = document.getElementById('admin-prod-img-text');
+        if(input.files && input.files[0]) {
+            textLabel.innerText = "Imagem Selecionada: " + input.files[0].name;
+            const reader = new FileReader();
+            reader.onload = function(e) { adminTempImage = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function criarNovoProdutoAdmin(event) {
+      event.preventDefault();
+      const nome = document.getElementById('admin-prod-name').value.trim();
+      const desc = document.getElementById('admin-prod-desc').value.trim();
+      const pts = parseInt(document.getElementById('admin-prod-pts').value);
+      lojinhaProdutos.push({ id: `dyn-prod-${Date.now()}`, nome, desc, pts, tipo: 'produto', image: adminTempImage });
+      renderizarLojinha();
+      simularAcao('Produto Cadastrado!', `"${nome}" foi adicionado à lojinha com sucesso.`);
+    }
+
+  </script>
+</body>
+</html>
