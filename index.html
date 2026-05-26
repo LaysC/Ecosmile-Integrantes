@@ -1,126 +1,2583 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoSmile - Sustentabilidade Digital</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V1SouSmile - Portal do Cliente & Admin</title>
+  
+  <!-- Importação de fonte moderna e limpa (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS para estilização rápida e responsiva -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Biblioteca html2canvas para captura de ecrã em PNG de alta fidelidade -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              coral: '#ff9466',        // Coral Oficial
+              emerald: '#296e6e',      // Esmeralda para textos de suporte
+              black: '#303030',        // Grafite Escuro Oficial
+              peach: '#ffd4ab',        // Pêssego Suave (Bordas dos inputs)
+              grey: '#8b8b8b',         // Cinza de suporte
+              lightEmerald: '#d1f0f0', // Fundo verde suave para badges
+              lightCoral: '#ffe5cc',   // Fundo coral suave
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilização para simular a curvatura perfeita física de um telemóvel topo de gama */
+    .phone-shadow {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 
+                  0 0 0 1px rgba(0, 0, 0, 0.1),
+                  inset 0 0 4px rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Input com transições de foco elegantes baseadas na paleta SouSmile */
+    .input-field {
+      border-color: #ffd4ab;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .input-field:focus {
+      border-color: #ff9466 !important;
+      box-shadow: 0 0 0 4px rgba(255, 148, 102, 0.12);
+      outline: none;
+    }
+
+    /* Botão de pílula premium */
+    .btn-pill {
+      background-color: #ff9466;
+      transition: all 0.25s ease-in-out;
+    }
+    .btn-pill:hover {
+      background-color: #f58353;
+    }
+    .btn-pill:active {
+      transform: translateY(0);
+    }
+
+    /* Transição de ecrã suave */
+    .view-transition {
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    /* Ocultar barra de rolagem mantendo a funcionalidade de scroll nativo */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
-<body>
-    <nav id="navbar">
-        <div class="nav-content">
-            <div class="logo">
-                EcoSmile
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 text-[#303030] antialiased relative">
+
+  <!-- BOTÕES FLUTUANTES DE EXPORTAÇÃO E GRAVAÇÃO -->
+  <div class="mb-6 sm:absolute sm:top-6 sm:right-6 sm:mb-0 z-50 flex items-center space-x-3">
+    
+    <!-- Botão de Gravação de Vídeo -->
+    <button 
+      onclick="toggleGravacao()" 
+      id="btnRecord"
+      class="bg-brand-black text-white hover:bg-brand-coral px-5 py-3 rounded-2xl shadow-xl font-bold text-sm flex items-center space-x-2 transition-all duration-300 active:scale-95"
+    >
+      <!-- Ícone Circle (Record) -->
+      <svg id="iconRecord" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="6"></circle>
+      </svg>
+      <!-- Ícone Square (Stop) - Escondido por defeito -->
+      <svg id="iconStop" class="w-5 h-5 text-white hidden" fill="currentColor" viewBox="0 0 24 24">
+        <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+      </svg>
+      <span id="btnRecordText">Gravar Uso</span>
+    </button>
+
+    <!-- Botão de Download PNG -->
+    <button 
+      onclick="baixarComoPNG()" 
+      id="btnDownload"
+      class="bg-brand-black text-white hover:bg-brand-coral px-5 py-3 rounded-2xl shadow-xl font-bold text-sm flex items-center space-x-2 transition-all duration-300 active:scale-95"
+    >
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      <span id="btnDownloadText">Baixar PNG</span>
+    </button>
+  </div>
+
+  <!-- DISPOSITIVO MÓVEL FÍSICO SIMULADO (iPhone / Android Premium) -->
+  <div 
+    id="phone-simulator" 
+    class="relative w-full max-w-[390px] h-[844px] bg-white rounded-[56px] border-[12px] border-slate-950 phone-shadow overflow-hidden flex flex-col justify-between select-none"
+  >
+    
+    <!-- Câmera Frontal / Dynamic Island no topo do telemóvel -->
+    <div class="absolute top-3 left-1/2 transform -translate-x-1/2 w-28 h-7 bg-slate-950 rounded-full z-30 flex items-center justify-between px-4">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#101010] border border-slate-900"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-[#151515]"></span>
+    </div>
+
+    <!-- Barra de Status do Sistema do Telemóvel -->
+    <div class="px-8 pt-3 pb-2 flex justify-between items-center text-[11px] text-slate-500 font-bold z-20 bg-white">
+      <span>09:41</span>
+      <div class="flex items-center space-x-1.5">
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+          <path d="M2 22h20V2z" />
+        </svg>
+        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+          <path d="M12 21l-12-18h24z" />
+        </svg>
+        <div class="w-5 h-2.5 border border-slate-400 rounded-sm p-0.5 flex items-center">
+          <div class="h-full w-4 bg-slate-600 rounded-2xs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cabeçalho Interno do Aplicativo -->
+    <div class="px-6 pt-4 flex items-center justify-between z-10 bg-white">
+      <!-- Botão Voltar (<) - Ocultado dinamicamente na Home, Admin e Login -->
+      <button id="header-back-button" onclick="voltarParaAnterior()" class="p-2 -ml-2 rounded-full hover:bg-slate-50 transition-colors text-brand-black focus:outline-none" aria-label="Voltar" style="visibility: hidden;">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ================= TELA DE LOGIN ================= -->
+    <div id="view-login" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-100 transform translate-x-0">
+      
+      <!-- Logo Oficial SouSmile -->
+      <div class="mb-6 select-none h-12 flex items-center">
+        <img 
+          src="sousmile_logo_preto_laranja.png" 
+          alt="SouSmile" 
+          class="h-10 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback-login').classList.remove('hidden');"
+        >
+        <div id="logo-fallback-login" class="hidden flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral text-[38px] leading-none">smile</span>
+        </div>
+      </div>
+
+      <!-- Textos Principais da Tela -->
+      <div class="mb-4">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Acessar portal</span>
+        <h1 id="login-welcome-title" class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+          Boas-vindas de volta
+        </h1>
+      </div>
+
+      <!-- Seletor de Tipo de Login (Cliente vs Admin) -->
+      <div class="flex bg-slate-50 p-1 rounded-2xl mb-6 text-center text-xs font-bold border border-slate-100">
+        <button type="button" onclick="alternarTipoLogin('client')" id="tab-login-client" class="flex-1 py-2.5 rounded-xl bg-white text-brand-coral shadow-xs focus:outline-none transition-all">
+          Cliente
+        </button>
+        <button type="button" onclick="alternarTipoLogin('admin')" id="tab-login-admin" class="flex-1 py-2.5 rounded-xl text-brand-grey hover:text-brand-black focus:outline-none transition-all">
+          Administrador
+        </button>
+      </div>
+
+      <!-- Formulário de Login Clínico -->
+      <form id="loginForm" class="space-y-5" onsubmit="executarLogin(event)">
+        
+        <div class="space-y-4">
+          <!-- Identificador do Formulário -->
+          <h2 id="login-form-subtitle" class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1">
+            Fazer Login:
+          </h2>
+
+          <!-- Campo Email (Envelope Clássico Vetorial) -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+            </span>
+            <input 
+              type="email" 
+              id="login-email"
+              placeholder="seuemail@exemplo.com.br" 
+              required
+              class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+          </div>
+
+          <!-- Campo Senha -->
+          <div id="login-password-container">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+              <input 
+                type="password" 
+                id="login-password" 
+                placeholder="Senha" 
+                required
+                class="w-full pl-11 pr-12 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+              <!-- Botão para Mostrar/Ocultar Senha -->
+              <button 
+                type="button" 
+                onclick="togglePassword('login-password', 'eyeOpen-login', 'eyeClosed-login')" 
+                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+              >
+                <svg id="eyeOpen-login" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="eyeClosed-login" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
+              </button>
             </div>
-            <ul class="nav-links">
-                <li><a href="#home">Início</a></li>
-                <li><a href="#sobre">O Projeto</a></li>
-                <li><a href="#equipe">Equipe</a></li>
-            </ul>
+            
+            <div class="flex justify-end mt-2 px-1">
+              <button type="button" onclick="irParaRecuperar()" class="text-xs font-bold text-brand-emerald hover:underline focus:outline-none">
+                Esqueceu sua senha?
+              </button>
+            </div>
+          </div>
         </div>
-    </nav>
 
-    <section id="home" class="hero">
-        <div class="hero-shape"></div> <div class="hero-content fade-in">
-            <div class="badge">Apresentação final projeto integrador - PI </div>
-            <h1 class="gradient-text">EcoSmile</h1>
-            <h2>Tecnologia e sustentabilidade conectando sorrisos ao futuro</h2>
-            <p>Uma experiência digital, sustentável e interativa para a logística reversa de alinhadores, integrando tecnologia e cuidado ambiental.</p>
-            <a href="#equipe" class="btn-primary">Conheça a Equipe <i class="fa-solid fa-arrow-down"></i></a>
+        <!-- Botão Entrar -->
+        <button 
+          type="submit" 
+          id="btnSubmitLogin"
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Entrar
+        </button>
+
+        <!-- Botão Auto-fill para Admin Demo -->
+        <button 
+          type="button"
+          id="btnAdminDemo"
+          onclick="autofillAdminAndLogin()"
+          class="w-full py-3 bg-brand-emerald/10 text-brand-emerald hover:bg-brand-emerald/25 font-bold text-xs rounded-full transition-all duration-200 mt-2 hidden"
+        >
+          Entrar como Admin (Demo)
+        </button>
+
+        <p id="login-signup-link" class="text-sm text-brand-grey font-medium text-center mt-4">
+          Não possui conta? 
+          <button type="button" onclick="irParaCadastro()" class="font-extrabold hover:underline text-brand-coral ml-1 focus:outline-none">
+            Cadastre-se
+          </button>
+        </p>
+
+      </form>
+    </div>
+
+    <!-- ================= TELA DE CADASTRO ================= -->
+    <div id="view-cadastro" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden">
+      
+      <!-- Logo Oficial SouSmile -->
+      <div class="mb-4 select-none h-12 flex items-center">
+        <img 
+          src="sousmile_logo_preto_laranja.png" 
+          alt="SouSmile" 
+          class="h-10 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback-cadastro').classList.remove('hidden');"
+        >
+        <div id="logo-fallback-cadastro" class="hidden flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral leading-none">smile</span>
         </div>
-    </section>
+      </div>
 
-    <section id="sobre" class="sobre">
-        <div class="section-header fade-in">
-            <h2>Sobre o Projeto</h2>
-            <p>Transformando o descarte dos alinhadores em uma experiência digital com foco em ESG.</p>
+      <!-- Título de Cadastro -->
+      <div class="mb-6">
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight">
+          Preencha seus dados
+        </h1>
+      </div>
+
+      <!-- Formulário de Cadastro -->
+      <form id="cadastroForm" class="space-y-4" onsubmit="executarCadastro(event)">
+        
+        <div class="space-y-3">
+          
+          <!-- Campo Nome -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              id="cadastro-nome"
+              placeholder="Digite seu nome" 
+              required
+              class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+          </div>
+
+          <!-- Campo Email (Envelope Clássico) -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+            </span>
+            <input 
+              type="email" 
+              id="cadastro-email"
+              placeholder="Digite seu email" 
+              required
+              class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+          </div>
+
+          <!-- Campo Senha -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <input 
+              type="password" 
+              id="cadastro-password" 
+              placeholder="Digite sua senha" 
+              required
+              class="w-full pl-11 pr-12 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('cadastro-password', 'eyeOpen-cad', 'eyeClosed-cad')" 
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+            >
+              <svg id="eyeOpen-cad" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eyeClosed-cad" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Campo Confirmar Senha -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <input 
+              type="password" 
+              id="cadastro-confirm" 
+              placeholder="Digite sua senha novamente" 
+              required
+              class="w-full pl-11 pr-12 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('cadastro-confirm', 'eyeOpen-conf', 'eyeClosed-conf')" 
+              class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+            >
+              <svg id="eyeOpen-conf" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 1 1 6 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eyeClosed-conf" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1-1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Botão Cadastrar -->
+        <button 
+          type="submit" 
+          id="btnSubmitCadastro"
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Cadastrar
+        </button>
+
+        <p class="text-sm text-brand-grey font-medium text-center mt-4">
+          Já possui uma conta? 
+          <button type="button" onclick="irParaLogin()" class="font-extrabold hover:underline text-brand-coral ml-1 focus:outline-none">
+            Entre
+          </button>
+        </p>
+
+      </form>
+    </div>
+
+    <!-- ================= TELA DE RECUPERAÇÃO DE SENHA ================= -->
+    <div id="view-recuperar" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden">
+      
+      <!-- Logo Oficial SouSmile (Escondido dinamicamente no estado de sucesso para evitar poluição visual) -->
+      <div id="recuperar-logo" class="mb-6 select-none h-12 flex items-center">
+        <img 
+          src="sousmile_logo_preto_laranja.png" 
+          alt="SouSmile" 
+          class="h-10 w-auto object-contain"
+          onerror="this.style.display='none'; document.getElementById('logo-fallback-recuperar').classList.remove('hidden');"
+        >
+        <div id="logo-fallback-recuperar" class="hidden flex items-baseline tracking-tight">
+          <span class="text-[38px] font-bold text-brand-black leading-none">sou</span><span class="text-[38px] font-bold text-brand-coral leading-none">smile</span>
+        </div>
+      </div>
+
+      <!-- ESTADO 1: Solicitar Recuperação -->
+      <div id="recuperar-estado-formulario" class="space-y-6">
+        <div>
+          <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Recuperação de acesso</span>
+          <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+            Recuperar senha
+          </h1>
+          <p class="text-brand-grey text-sm mt-2 font-medium leading-relaxed">
+            Esqueceu sua senha? Digite seu e-mail cadastrado e enviaremos um link de recuperação.
+          </p>
+        </div>
+
+        <!-- Formulário de Envio -->
+        <form id="recuperarForm" class="space-y-5" onsubmit="executarRecuperacao(event)">
+          <div class="space-y-4">
+            <!-- Campo Email (Envelope Clássico) -->
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+              </span>
+              <input 
+                type="email" 
+                id="recuperar-email"
+                placeholder="Digite seu e-mail de acesso" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- Botão Enviar Link -->
+          <button 
+            type="submit" 
+            id="btnSubmitRecuperar"
+            class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+          >
+            Enviar e-mail de recuperação
+          </button>
+        </form>
+
+        <p class="text-sm text-brand-grey font-medium text-center">
+          Lembrou sua senha?
+          <button type="button" onclick="irParaLogin()" class="font-extrabold hover:underline text-brand-coral ml-1 focus:outline-none">
+            Voltar ao login
+          </button>
+        </p>
+      </div>
+
+      <!-- ESTADO 2: Feedback de Sucesso Dinâmico (Logo ocultado para equilíbrio perfeito) -->
+      <div id="recuperar-estado-sucesso" class="hidden flex flex-col items-center text-center space-y-6 pt-4">
+        <!-- Ícone circular de sucesso da SouSmile -->
+        <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-brand-emerald shadow-inner">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <div class="space-y-3">
+          <h2 class="text-2xl font-bold text-brand-black tracking-tight">E-mail enviado!</h2>
+          <p id="recuperar-mensagem-sucesso" class="text-brand-grey text-base font-medium leading-relaxed px-2">
+            Enviamos um e-mail para recuperação <br>
+            <span id="email-obfuscado" class="font-extrabold text-brand-black select-text"></span>
+          </p>
+        </div>
+
+        <div class="w-full space-y-3 pt-4">
+          <button 
+            onclick="resetarERetornarLogin()" 
+            class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 shadow-md"
+          >
+            Voltar para o Login
+          </button>
+          
+          <p class="text-xs text-brand-grey font-medium">
+            Não recebeu? Verifique a pasta de spam ou 
+            <button onclick="resgatarFormularioRecuperacao()" class="font-bold text-brand-coral underline hover:text-[#f58353] focus:outline-none">
+              tente novamente
+            </button>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TELA INICIAL (HOME) ================= -->
+    <div id="view-home" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-8">
+      
+      <!-- Cabeçalho (Alinhado perfeitamente a px-8) -->
+      <div class="flex justify-between items-start mb-6 mt-3">
+        <div class="space-y-0.5">
+          <span class="text-lg font-medium text-brand-grey tracking-tight block">Boas-vindas,</span>
+          <h1 id="home-user-name" class="text-4xl font-extrabold text-brand-coral tracking-tight leading-none">
+            Felipe
+          </h1>
         </div>
         
-        <div class="cards-container">
-            <div class="feature-card fade-in">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-recycle"></i>
-                </div>
-                <h3>Objetivo</h3>
-                <p>Incentivar o descarte correto dos alinhadores, reduzindo resíduos plásticos e promovendo práticas mais sustentáveis através da logística reversa.</p>
+        <!-- Botão Sair Minimalista no Topo -->
+        <button onclick="sairDaConta()" class="flex items-center space-x-1.5 text-brand-grey hover:text-red-500 transition-colors duration-200 py-2 px-2.5 -mr-2 rounded-2xl hover:bg-slate-50 active:scale-95 focus:outline-none">
+          <span class="text-xs font-bold uppercase tracking-wider">Sair</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Lista de Cards e Features -->
+      <div class="space-y-4 max-h-[540px] overflow-y-auto no-scrollbar pr-1 pb-4">
+        
+        <!-- Card 1: Agendar Consulta -->
+        <button onclick="irParaAgendar()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Agendar consulta</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Agende sua próxima consulta com nossa equipe de especialistas</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 2: Agendamentos e histórico -->
+        <button onclick="irParaHistorico()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Agendamentos e histórico</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Confira consultas futuras ou histórico de consultas</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 3: EcoSmile -->
+        <button onclick="irParaEcoSmile()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <div class="flex items-center space-x-2">
+              <h3 class="text-base font-bold text-brand-black tracking-tight">EcoSmile</h3>
+              <span class="bg-[#d1f0f0] text-[#296e6e] text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Novo</span>
             </div>
-            <div class="feature-card fade-in delay-1">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-mobile-screen"></i>
-                </div>
-                <h3>Tecnologias</h3>
-                <p>Integração total com o aplicativo existente, unindo desenvolvimento web moderno, validação segura e uma jornada do paciente fluida.</p>
-            </div>
-            <div class="feature-card fade-in delay-2">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-gift"></i>
-                </div>
-                <h3>Diferenciais</h3>
-                <p>Sistema de pontos e recompensas que torna a experiência interativa, fortalecendo a marca SouSmile e o engajamento do paciente.</p>
-            </div>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Aprenda como e onde descartar seu alinhador e ganhe benefícios</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 4: Descontos -->
+        <button onclick="irParaDescontos()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Descontos</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Confira os descontos obtidos para sua conta</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ================= TELA ECOSMILE ================= -->
+    <div id="view-ecosmile" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Cabeçalho de Branding Integrado -->
+      <div class="flex items-center space-x-1 mb-6 mt-2">
+        <span class="text-3xl font-extrabold text-[#296e6e]">eco</span>
+        <span class="text-3xl font-light text-[#ff9466]">smile</span>
+      </div>
+
+      <!-- Espaço de Conteúdo Scrollable -->
+      <div class="space-y-6 text-xs text-brand-black leading-relaxed">
+        
+        <!-- O que é a EcoSmile? -->
+        <div class="space-y-2 bg-[#d1f0f0]/30 p-5 rounded-[24px] border border-[#296e6e]/10">
+          <h2 class="text-base font-bold text-[#296e6e] tracking-tight">O que é a EcoSmile?</h2>
+          <p class="text-brand-black/80 font-medium">
+            A EcoSmile é uma iniciativa sustentável que visa o descarte correto de seus alinhadores. Ao participar você ajuda o meio ambiente com práticas ecológicas e sustentáveis além de receber descontos para serviços da SouSmile!
+          </p>
         </div>
-    </section>
 
-    <section id="equipe" class="equipe">
-        <div class="section-header fade-in">
-            <h2>Quem Fez Acontecer</h2>
-            <p>Conecte-se com a equipe responsável por desenvolver o EcoSmile.</p>
+        <!-- Como preparar meu alinhador -->
+        <div class="space-y-3">
+          <h2 class="text-base font-bold text-[#303030] tracking-tight">Como preparar meu alinhador para descarte?</h2>
+          <p class="text-brand-black/80 font-medium">
+            Seu alinhador precisa ser preparado corretamente para descarte seguro. 
+          </p>
+          <p class="text-brand-black/80 font-medium">
+            Clique no botão abaixo e siga o passo a passo para aprender como seu alinhador deve ser preparado e faça parte de uma comunidade sustentável com a EcoSmile!
+          </p>
+          
+          <button 
+            onclick="abrirPassosPreparo()" 
+            class="w-full py-3.5 border-2 border-[#ff9466] text-[#ff9466] hover:bg-[#ffe5cc]/40 rounded-full font-bold text-sm transition-all duration-200 active:scale-95"
+          >
+            Preparando meu alinhador
+          </button>
         </div>
 
-        <div class="team-container">
-            <div class="team-card fade-in">
-                <div class="card-header-bg"></div>
-                <img src="assets/gustavo.jpg" alt="Gustavo Oliveira" id="avatar-gustavo" class="team-avatar">
-                <div class="team-info">
-                    <h3>Gustavo Oliveira</h3>
-                    <span class="role">UI Designer & Backend Admin</span>
-                    <p>Responsável pela prototipagem inicial no Figma e pelo desenvolvimento completo do backend voltado ao painel administrativo.</p>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/gustavoo-oliveira/" target="_blank" class="social-btn linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="https://github.com/gutt06" target="_blank" class="social-btn github"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                </div>
-            </div>
+        <!-- Onde posso descartar meu alinhador -->
+        <div class="space-y-3">
+          <h2 class="text-base font-bold text-[#303030] tracking-tight">Onde posso descartar meu alinhador?</h2>
+          <p class="text-brand-black/80 font-medium">
+            Descubra o local mais próximo de você para realizar o descarte do seu alinhador. Insira seu endereço no campo abaixo e veja as opções mais próximas de você.
+          </p>
+          
+          <!-- Input de Endereço -->
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+              <svg class="w-4 h-4 text-brand-grey" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input 
+              type="text" 
+              placeholder="Insira seu endereço" 
+              class="w-full pl-11 pr-5 py-3 border-2 rounded-full text-xs font-semibold bg-white input-field"
+            >
+          </div>
 
-            <div class="team-card fade-in delay-1">
-                <div class="card-header-bg"></div>
-                <img src="assets/fernanda.jpg" alt="Fernanda Soares" id="avatar-fernanda" class="team-avatar">
-                <div class="team-info">
-                    <h3>Fernanda Soares</h3>
-                    <span class="role">Desenvolvedora Frontend & Backend</span>
-                    <p>Responsável pela codificação do frontend das telas do aplicativo e pelo desenvolvimento estrutural do backend focado no cliente.</p>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/fernandaosribeiro1/?locale=pt" target="_blank" class="social-btn linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="https://github.com/fernandaosribeiro1" target="_blank" class="social-btn github"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-card fade-in delay-2">
-                <div class="card-header-bg"></div>
-                <img src="assets/lais.jpg" alt="Laís Carvalho" id="avatar-lais" class="team-avatar">
-                <div class="team-info">
-                    <h3>Laís Carvalho</h3>
-                    <span class="role">UI/UX Designer & Dev Lógica</span>
-                    <p>Responsável pelo redesign das interfaces com foco em UX, estruturação da lógica do aplicativo e alinhamento estratégico com a empresa parceira.</p>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/la%C3%ADs-carvalho-123595216" target="_blank" class="social-btn linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="https://github.com/LaysC" target="_blank" class="social-btn github"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                </div>
-            </div>
+          <!-- Cards de Endereços Redesenhados -->
+          <div id="ecosmile-points-container" class="space-y-2.5">
+            <!-- Inserido dinamicamente pelo JS -->
+          </div>
         </div>
-    </section>
 
-    <footer>
-        <div class="footer-content">
-            <h3 class="gradient-text">EcoSmile</h3>
-            <p>Sistemas para Internet - Senac Nações Unidas | 5º Semestre</p>
-            <p class="copyright">© 2026 - "Toda transformação começa com pequenas mudanças."</p>
+        <!-- Reciclou? Ganhou! -->
+        <div class="space-y-3 pt-2">
+          <h2 class="text-base font-bold text-[#303030] tracking-tight">Reciclou? Ganhou!</h2>
+          <p class="text-brand-black/80 font-medium">
+            Com a EcoSmile você ganha descontos para agendar uma consulta ou fazer um novo alinhador e ainda contribui com o meio ambiente!
+          </p>
+          <p class="text-brand-black/80 font-medium">
+            Tá esperando o que? Resgate seu desconto inserindo o token no campo abaixo.
+          </p>
+          
+          <!-- Validação de Token -->
+          <div class="space-y-3">
+            <div class="relative">
+              <input 
+                type="text" 
+                id="token-input"
+                placeholder="Insira o token (Ex: ECOSMILE)" 
+                class="w-full px-5 py-3 border-2 rounded-full text-xs font-semibold bg-white input-field"
+              >
+            </div>
+            
+            <!-- Feedbacks Dinâmicos de Sucesso e Erro -->
+            <div id="token-success" class="hidden text-emerald-600 font-extrabold text-xs pl-2 items-center space-x-1.5 animate-fade-in">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>Desconto resgatado com sucesso!</span>
+            </div>
+            <div id="token-error" class="hidden text-red-500 font-extrabold text-xs pl-2 items-center space-x-1.5 animate-fade-in">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+              <span>Token inválido</span>
+            </div>
+
+            <!-- Botão Resgatar Desconto -->
+            <button 
+              onclick="validarTokenEco()"
+              class="w-full py-4 text-white font-bold text-sm rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 shadow-md"
+            >
+              Resgatar desconto
+            </button>
+          </div>
         </div>
-    </footer>
 
-    <script src="script.js"></script>
+      </div>
+
+    </div>
+
+    <!-- ================= TELA DE DESCONTOS ================= -->
+    <div id="view-descontos" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Cabeçalho de Título -->
+      <div class="mb-6 mt-2">
+        <h1 class="text-3xl font-extrabold text-brand-black tracking-tight leading-tight">
+          Meus descontos
+        </h1>
+      </div>
+
+      <!-- Container das Ações/Cards de Desconto -->
+      <div id="descontos-container" class="space-y-5">
+        <!-- Inserido dinamicamente pelo JS -->
+      </div>
+
+    </div>
+
+    <!-- ================= TELA DE AGENDAR CONSULTA ================= -->
+    <div id="view-agendar" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Cabeçalho da Tela -->
+      <div class="mb-6 mt-2">
+        <h1 class="text-3xl font-extrabold text-brand-black tracking-tight leading-tight">
+          Agendar consulta
+        </h1>
+      </div>
+
+      <!-- Formulário de Agendamento -->
+      <form id="agendarForm" class="space-y-6 text-xs font-semibold" onsubmit="confirmarAgendamento(event)">
+        
+        <!-- 1. Tipo de consulta -->
+        <div class="space-y-3">
+          <span class="text-xs font-bold text-brand-emerald uppercase tracking-wider block">Tipo de consulta</span>
+          <div id="tipo-consulta-container" class="grid grid-cols-1 gap-2.5">
+            <!-- Inserido dinamicamente pelo JavaScript -->
+          </div>
+        </div>
+
+        <!-- 2. Unidade de Atendimento -->
+        <div class="space-y-3">
+          <span class="text-xs font-bold text-brand-emerald uppercase tracking-wider block">Unidade</span>
+          <div class="grid grid-cols-1 gap-2.5">
+            
+            <!-- Unidade 1 -->
+            <button type="button" id="unit-opt-1" onclick="selecionarUnidade('Paulista - Av. Exemplo, 1245', 'unit-opt-1', 'unit-opt-2', 'unit-opt-3')" class="w-full p-4 border-2 border-brand-peach hover:border-brand-coral rounded-3xl bg-white text-left transition-all duration-200 flex items-center space-x-3">
+              <span class="p-2 bg-brand-lightCoral rounded-xl text-brand-coral flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <div>
+                <h4 class="font-bold text-[#303030]">Unidade 1</h4>
+                <p class="text-[10px] text-brand-grey mt-0.5">Avenida Exemplo número 1245</p>
+              </div>
+            </button>
+
+            <!-- Unidade 2 -->
+            <button type="button" id="unit-opt-2" onclick="selecionarUnidade('Pinheiros - Rua Nova, 872', 'unit-opt-2', 'unit-opt-1', 'unit-opt-3')" class="w-full p-4 border-2 border-brand-peach hover:border-brand-coral rounded-3xl bg-white text-left transition-all duration-200 flex items-center space-x-3">
+              <span class="p-2 bg-brand-lightCoral rounded-xl text-brand-coral flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <div>
+                <h4 class="font-bold text-[#303030]">Unidade 2</h4>
+                <p class="text-[10px] text-brand-grey mt-0.5">Rua Nova número 872</p>
+              </div>
+            </button>
+
+            <!-- Unidade 3 -->
+            <button type="button" id="unit-opt-3" onclick="selecionarUnidade('Itaim - Av. Chocolate, 389', 'unit-opt-3', 'unit-opt-1', 'unit-opt-2')" class="w-full p-4 border-2 border-brand-peach hover:border-brand-coral rounded-3xl bg-white text-left transition-all duration-200 flex items-center space-x-3">
+              <span class="p-2 bg-brand-lightCoral rounded-xl text-brand-coral flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <div>
+                <h4 class="font-bold text-[#303030]">Unidade 3</h4>
+                <p class="text-[10px] text-brand-grey mt-0.5">Avenida Chocolate 389</p>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- 3. Data e Hora -->
+        <div class="space-y-3">
+          <span class="text-xs font-bold text-brand-emerald uppercase tracking-wider block">Data e hora</span>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] text-brand-grey mb-1 pl-1">Selecione a data</label>
+              <input type="date" id="agendar-data" required class="w-full px-4 py-3.5 border-2 rounded-2xl text-xs font-semibold bg-white input-field text-center">
+            </div>
+            <div>
+              <label class="block text-[10px] text-brand-grey mb-1 pl-1">Hora</label>
+              <input type="time" id="agendar-hora" required class="w-full px-4 py-3.5 border-2 rounded-2xl text-xs font-semibold bg-white input-field text-center">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Desconto -->
+        <div class="space-y-3">
+          <span class="text-xs font-bold text-brand-emerald uppercase tracking-wider block">Desconto</span>
+          <div class="grid grid-cols-1 gap-2.5">
+            <!-- Inserido dinamicamente pelo JS -->
+          </div>
+        </div>
+
+        <!-- 5. Resumo de Valores -->
+        <div class="border-t border-slate-100 pt-4 space-y-2">
+          <span class="text-xs font-bold text-brand-emerald uppercase tracking-wider block">Valor</span>
+          <div class="flex justify-between text-brand-grey font-semibold text-xs">
+            <span>Subtotal:</span>
+            <span id="summary-subtotal">R$ 0</span>
+          </div>
+          <div id="summary-discount-row" class="hidden flex justify-between text-brand-coral font-bold text-xs">
+            <span>Desconto aplicado:</span>
+            <span id="summary-discount">-R$ 0</span>
+          </div>
+          <div class="flex justify-between text-brand-black font-extrabold text-base border-t border-dashed border-slate-100 pt-2">
+            <span>Valor Total:</span>
+            <span id="summary-total">R$ 0</span>
+          </div>
+        </div>
+
+        <!-- Botão Principal de Confirmação -->
+        <button type="submit" class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md">
+          Agendar consulta
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- ================= TELA DE HISTÓRICO DE AGENDAMENTOS ================= -->
+    <div id="view-historico" class="view-transition px-6 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-4 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Cabeçalho de Título -->
+      <div class="mb-5 mt-2">
+        <h1 class="text-3xl font-extrabold text-brand-black tracking-tight leading-tight">
+          Agendamentos
+        </h1>
+      </div>
+
+      <!-- Tabs Seletoras -->
+      <div class="flex border-b border-slate-100 mb-5 text-center text-xs font-bold">
+        <button onclick="alternarAbasHistorico('upcoming')" id="tab-upcoming" class="flex-1 pb-3 border-b-2 border-brand-coral text-brand-coral focus:outline-none">
+          Próximas
+        </button>
+        <button onclick="alternarAbasHistorico('past')" id="tab-past" class="flex-1 pb-3 border-b-2 border-transparent text-brand-grey hover:text-brand-black focus:outline-none">
+          Histórico
+        </button>
+      </div>
+
+      <!-- CONTEÚDO DA ABA: Próximas Consultas -->
+      <div id="upcoming-list" class="space-y-4">
+        <!-- Card Próxima 1 -->
+        <div class="border border-brand-peach rounded-[24px] p-5 bg-white space-y-3 shadow-sm">
+          <div class="flex justify-between items-start">
+            <span class="bg-[#d1f0f0] text-[#296e6e] text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Confirmada</span>
+            <span class="text-[11px] text-brand-grey font-bold">24/05/2026 às 14:00</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-brand-black tracking-tight">Consulta de Avaliação Clínica</h3>
+            <p class="text-[10px] text-brand-grey font-medium mt-0.5">Unidade 1 — Avenida Exemplo número 1245</p>
+          </div>
+        </div>
+
+        <!-- Espaço Dinâmico para novos agendamentos criados no simulador -->
+        <div id="dynamic-appointments" class="space-y-4"></div>
+      </div>
+
+      <!-- CONTEÚDO DA ABA: Histórico / Passadas -->
+      <div id="past-list" class="hidden space-y-4">
+        <!-- Consulta Passada 1 -->
+        <div class="border border-slate-200 rounded-[24px] p-5 bg-slate-50/50 space-y-3 opacity-80">
+          <div class="flex justify-between items-start">
+            <span class="bg-slate-200 text-slate-500 text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Realizada</span>
+            <span class="text-[11px] text-slate-400 font-bold">10/01/2026 às 10:00</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-500 tracking-tight">Escaneamento e fotos 3D</h3>
+            <p class="text-[10px] text-slate-400 font-medium mt-0.5">Unidade 2 — Rua Nova número 872</p>
+          </div>
+        </div>
+
+        <!-- Consulta Passada 2 -->
+        <div class="border border-slate-200 rounded-[24px] p-5 bg-slate-50/50 space-y-3 opacity-80">
+          <div class="flex justify-between items-start">
+            <span class="bg-slate-200 text-slate-500 text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Realizada</span>
+            <span class="text-[11px] text-slate-400 font-bold">18/12/2025 às 15:30</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-500 tracking-tight">Consulta odontológica inicial</h3>
+            <p class="text-[10px] text-slate-400 font-medium mt-0.5">Unidade 1 — Avenida Exemplo número 1245</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TELA PAINEL ADMINISTRATIVO (DASHBOARD) ================= -->
+    <div id="view-admin-dashboard" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-8 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Topo do Painel de Controle (Saudação e Nome Exatos) -->
+      <div class="flex justify-between items-start mb-8 mt-3">
+        <div class="space-y-0.5">
+          <span class="text-lg font-medium text-brand-grey tracking-tight block">Bem-vindo,</span>
+          <h1 class="text-4xl font-extrabold text-brand-coral tracking-tight leading-none">Administrador</h1>
+        </div>
+        
+        <!-- Sair do Admin no Topo -->
+        <button onclick="sairDaConta()" class="flex items-center space-x-1.5 text-brand-grey hover:text-red-500 transition-colors duration-200 py-2 px-2.5 -mr-2 rounded-2xl hover:bg-slate-50 active:scale-95 focus:outline-none">
+          <span class="text-xs font-bold uppercase tracking-wider">Sair</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Grade de Ações Administrativas Exatas do seu Wireframe -->
+      <div class="space-y-4">
+        
+        <!-- Card 1: Cadastrar tipo de consulta -->
+        <button onclick="irParaCriarConsultaAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar tipo de consulta</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Criar tipo de consulta disponível para os usuários</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 2: Cadastrar desconto -->
+        <button onclick="irParaCriarDescontoAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar desconto</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Criar qual o tipo e valor do desconto</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 3: Cadastrar ponto de coleta -->
+        <button onclick="irParaCriarPontoAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar ponto de coleta</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Cadastrar um novo ponto de coleta</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+        <!-- Card 4: Cadastrar token -->
+        <button onclick="irParaGerarTokenAdmin()" class="w-full text-left p-5 border border-brand-peach rounded-[24px] bg-white hover:bg-slate-50/50 transition-all duration-200 active:scale-[0.98] flex justify-between items-center group">
+          <div class="space-y-1 pr-4">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">Cadastrar token</h3>
+            <p class="text-[11px] text-brand-grey font-medium leading-relaxed">Criar um novo token para desconto</p>
+          </div>
+          <div class="text-brand-coral group-hover:translate-x-1 transition-transform duration-200 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ================= TELA GESTÃO ADMIN: CRIAR TIPO DE CONSULTA ================= -->
+    <div id="view-admin-criar-consulta" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden">
+      
+      <!-- Título de Criação Clínico Exato -->
+      <div class="mb-8">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+          Criar tipo de consulta
+        </h1>
+      </div>
+
+      <!-- Formulário de Criação -->
+      <form id="adminCriarConsultaForm" class="space-y-5" onsubmit="criarNovaConsultaAdmin(event)">
+        
+        <div class="space-y-4">
+          
+          <!-- 1. Tipo de consulta (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Tipo de consulta</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone de Prancheta Médica -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-new-title"
+                placeholder="Tipo de consulta" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 2. Unidade (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Unidade</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Marcador Pin de Localização -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-new-unit"
+                placeholder="Digite a unidade" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 3. Valor (Input de Valor / Número) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Valor</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Cifrão / Financeiro -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                </svg>
+              </span>
+              <input 
+                type="number" 
+                id="admin-new-value"
+                placeholder="Digite o valor da consulta" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botão Primário Criar -->
+        <button 
+          type="submit" 
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Criar
+        </button>
+
+      </form>
+    </div>
+
+    <!-- ================= TELA GESTÃO ADMIN: CRIAR TIPO DE DESCONTO ================= -->
+    <div id="view-admin-criar-desconto" class="view-transition px-8 flex-grow flex flex-col justify-center bg-white opacity-0 transform translate-x-8 hidden">
+      
+      <!-- Título de Criação Clínico Exato -->
+      <div class="mb-8">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+          Criar tipo de desconto
+        </h1>
+      </div>
+
+      <!-- Formulário de Criação -->
+      <form id="adminCriarDescontoForm" class="space-y-5" onsubmit="criarNovoDescontoAdmin(event)">
+        
+        <div class="space-y-4">
+          
+          <!-- 1. Tipo de desconto (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Tipo de desconto</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone de Etiqueta de Cupom -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-1.305-1.305l-3.71-1.855a3 3 0 0 0-4.024 4.024l1.855 3.71a3 3 0 0 0 1.305 1.305l3.71 1.855a3 3 0 0 0 4.024-4.024l-1.855-3.71z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 4.75h6.5v6.5m-6.5-6.5l8.5 8.5m-8.5-8.5l-6 6M17.5 7.5h.01" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-discount-title"
+                placeholder="Tipo de desconto" 
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 2. Data de expiração (Input de Data) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Data de expiração</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Calendário -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-18 0h18" />
+                </svg>
+              </span>
+              <input 
+                type="date" 
+                id="admin-discount-expiry"
+                required
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 3. Valor (Input de Valor / Percentual) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Valor (% de Desconto)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Porcentagem -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l6 6m0-6a3 3 0 11-6 0 3 3 0 016 0zm-6 6a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <input 
+                type="number" 
+                id="admin-discount-value"
+                placeholder="Digite o valor do desconto (ex: 15)" 
+                required
+                min="1"
+                max="100"
+                class="w-full pl-11 pr-5 py-4 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botão Primário Criar -->
+        <button 
+          type="submit" 
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Criar
+        </button>
+
+      </form>
+    </div>
+
+    <!-- ================= TELA GESTÃO ADMIN: CRIAR PONTO DE COLETA ================= -->
+    <div id="view-admin-criar-ponto" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Título de Criação Clínico Exato -->
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+          Criar ponto de coleta
+        </h1>
+      </div>
+
+      <!-- Formulário de Criação -->
+      <form id="adminCriarPontoForm" class="space-y-5 text-xs font-semibold" onsubmit="criarNovoPontoAdmin(event)">
+        
+        <div class="space-y-4">
+          
+          <!-- 1. Nome do Ponto (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Nome do Ponto</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone de Estabelecimento comercial -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V21m-6.75 0h15m-15 0a2.25 2.25 0 0 1-2.25-2.25V6.108c0-1.135.845-2.098 1.976-2.192a48.424 48.424 0 0 1 11.298 0c1.13.094 1.976 1.057 1.976 2.192V18.75a2.25 2.25 0 0 1-2.25 2.25M6 6.75h.008v.008H6V6.75zm.375 0h.008v.008H6.375V6.75zm-.375 2.25H6v.008h.008V9zm.375 0h.008v.008H6.375V9z" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-point-name"
+                placeholder="Nome do ponto de coleta" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 2. Endereço (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Endereço</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Marcador Pin -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-point-address"
+                placeholder="Endereço do ponto de coleta" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 3. Latitude (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Latitude</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Compass / Bússola -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1 1 15 0z" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-point-lat"
+                placeholder="Latitude do ponto de coleta" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 4. Longitude (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Longitude</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Longitude -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21V12" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-point-lng"
+                placeholder="Longitude do ponto de coleta" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+          <!-- 5. Horário (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Horário</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone Relógio -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-point-hours"
+                placeholder="Horario do ponto de coleta" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botão Primário Criar -->
+        <button 
+          type="submit" 
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Criar
+        </button>
+
+      </form>
+    </div>
+
+    <!-- ================= TELA GESTÃO ADMIN: GERAR TOKEN ================= -->
+    <div id="view-admin-gerar-token" class="view-transition px-8 flex-grow flex flex-col justify-start bg-white opacity-0 transform translate-x-8 hidden pt-6 overflow-y-auto no-scrollbar pb-8">
+      
+      <!-- Título de Criação Clínico Exato -->
+      <div class="mb-6 mt-2">
+        <span class="text-[11px] font-extrabold text-brand-emerald uppercase tracking-widest text-left block">Administrador</span>
+        <h1 class="text-[32px] font-bold text-brand-black tracking-tight leading-tight mt-1">
+          Gerar Token
+        </h1>
+      </div>
+
+      <!-- Formulário de Criação de Token -->
+      <form id="adminGerarTokenForm" class="space-y-5 text-xs font-semibold" onsubmit="criarNovoTokenAdmin(event)">
+        
+        <div class="space-y-4">
+          <!-- 1. Tipo de desconto (Input de Texto) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1 block">Tipo de desconto</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 pointer-events-none">
+                <!-- Ícone de Etiqueta de Cupom -->
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-1.305-1.305l-3.71-1.855a3 3 0 0 0-4.024 4.024l1.855 3.71a3 3 0 0 0 1.305 1.305l3.71 1.855a3 3 0 0 0 4.024-4.024l-1.855-3.71z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 4.75h6.5v6.5m-6.5-6.5l8.5 8.5m-8.5-8.5l-6 6M17.5 7.5h.01" />
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="admin-token-discount-type"
+                placeholder="Tipo de desconto" 
+                required
+                class="w-full pl-11 pr-5 py-3.5 border-2 rounded-3xl text-base font-medium bg-white input-field"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão Primário Gerar -->
+        <button 
+          type="submit" 
+          class="w-full py-4 text-white font-bold text-lg rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 mt-4 shadow-md"
+        >
+          Gerar
+        </button>
+
+      </form>
+
+      <!-- Seção: Tokens Gerados -->
+      <div class="mt-8 space-y-3.5">
+        <h2 class="text-xs font-bold text-brand-emerald uppercase tracking-wider pl-1">Tokens Gerados</h2>
+        <div id="admin-tokens-container" class="space-y-2.5">
+          <!-- Inserido dinamicamente pelo JavaScript -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Rodapé do Celular com Termos de Aceite e indicador de navegação -->
+    <div id="phone-footer" class="px-8 pb-8 pt-4 text-center bg-white border-t border-slate-50 z-10 flex flex-col items-center space-y-3.5">
+      <!-- Seção de Termos de Aceite Consolidada -->
+      <p class="text-[10px] text-brand-grey font-medium leading-relaxed max-w-[260px]">
+        Ao prosseguir, você concorda com nossos <br>
+        <a href="#" class="underline hover:text-brand-black transition-colors">Termos de Serviço</a> e <a href="#" class="underline hover:text-brand-black transition-colors">Política de Privacidade</a>.
+      </p>
+      
+      <!-- Linha Indicadora Virtual de Navegação do iOS no Rodapé da Tela -->
+      <div class="w-32 h-1 bg-slate-900 rounded-full mx-auto mt-2 opacity-80"></div>
+    </div>
+
+  </div>
+
+  <!-- Modal Discreto para Simulação de Sucesso -->
+  <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border border-slate-100">
+      <h3 id="modalTitle" class="text-lg font-bold text-brand-black">Login Realizado!</h3>
+      <p id="modalDesc" class="text-sm text-brand-grey mt-2">Os dados de acesso simulados foram validados com sucesso.</p>
+      <button 
+        onclick="fecharModal()" 
+        class="mt-4 px-6 py-2.5 bg-brand-coral text-white rounded-full font-bold text-sm hover:bg-[#f58353] transition-colors w-full"
+      >
+        Ok, continuar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Passo a Passo Clínico -->
+  <div id="preparoModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-[32px] p-6 max-w-sm w-full shadow-2xl border border-slate-100 relative">
+      <h3 class="text-xl font-extrabold text-brand-black tracking-tight mb-4">Passos para Descarte</h3>
+      
+      <div class="space-y-4 text-xs font-semibold text-brand-black/90">
+        <div class="flex items-start space-x-3">
+          <span class="w-6 h-6 bg-brand-lightCoral text-[#ff9466] rounded-full flex items-center justify-center flex-shrink-0">1</span>
+          <p class="pt-0.5 leading-relaxed">Lave bem seus alinhadores antigos com sabão neutro e água corrente.</p>
+        </div>
+        <div class="flex items-start space-x-3">
+          <span class="w-6 h-6 bg-brand-lightCoral text-[#ff9466] rounded-full flex items-center justify-center flex-shrink-0">2</span>
+          <p class="pt-0.5 leading-relaxed">Seque totalmente para evitar acúmulo de microorganismos na coleta.</p>
+        </div>
+        <div class="flex items-start space-x-3">
+          <span class="w-6 h-6 bg-brand-lightCoral text-[#ff9466] rounded-full flex items-center justify-center flex-shrink-0">3</span>
+          <p class="pt-0.5 leading-relaxed">Insira em uma embalagem de descarte sustentável e traga ao ponto de coleta!</p>
+        </div>
+      </div>
+
+      <button 
+        onclick="fecharPreparo()" 
+        class="mt-6 w-full py-3.5 bg-[#ff9466] hover:bg-[#f58353] text-white rounded-full font-bold text-sm transition-colors shadow-md"
+      >
+        Entendi, pronto!
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts para Lógica de Interação, Transições e Download -->
+  <script>
+    // ================= FUNCIONALIDADE DE GRAVAÇÃO DO ECRÃ (MEDIARECORDER API) =================
+    let mediaRecorder;
+    let recordedChunks = [];
+
+    async function toggleGravacao() {
+      const btnRecord = document.getElementById('btnRecord');
+      const btnRecordText = document.getElementById('btnRecordText');
+      const iconRecord = document.getElementById('iconRecord');
+      const iconStop = document.getElementById('iconStop');
+
+      // Se já estiver a gravar, então pára
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        return;
+      }
+
+      // Inicia o pedido de partilha do ecrã
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { preferCurrentTab: true },
+          audio: false
+        });
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = function (e) {
+          if (e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = function () {
+          // Prepara e descarrega o vídeo resultante
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          a.style = 'display: none';
+          a.href = url;
+          a.download = 'sousmile_navegacao.webm';
+          a.click();
+          window.URL.revokeObjectURL(url);
+          recordedChunks = [];
+
+          // Termina as faixas de gravação completamente para fechar o símbolo do navegador
+          stream.getTracks().forEach(track => track.stop());
+
+          // Repõe o botão visualmente
+          btnRecord.classList.remove('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+          btnRecord.classList.add('bg-brand-black', 'hover:bg-brand-coral');
+          btnRecordText.innerText = 'Gravar Uso';
+          iconRecord.classList.remove('hidden');
+          iconStop.classList.add('hidden');
+        };
+
+        // Inicia efetivamente a gravação dos bytes
+        mediaRecorder.start();
+
+        // Altera o visual do botão para "Gravando"
+        btnRecord.classList.remove('bg-brand-black', 'hover:bg-brand-coral');
+        btnRecord.classList.add('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+        btnRecordText.innerText = 'Parar Gravação';
+        iconRecord.classList.add('hidden');
+        iconStop.classList.remove('hidden');
+
+        // Escuta caso o utilizador pare a partilha através do popup do próprio browser
+        stream.getVideoTracks()[0].onended = function () {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        };
+
+      } catch (err) {
+        // Remover console.error para não acionar o alerta de erro na interface do Canvas
+        console.log("Nota: A API de captura de ecrã está restrita neste ambiente de sandbox. Exibindo modal informativo.");
+        
+        // Exibe um modal elegante informando sobre a restrição de segurança da sandbox
+        document.getElementById('modalTitle').innerText = "Gravação Restrita";
+        document.getElementById('modalDesc').innerText = "O ambiente de visualização atual bloqueia a captura de ecrã por segurança. Para utilizar a gravação de vídeo de forma nativa, faça o download do ficheiro (Botão Baixar PNG, e salve como HTML) e abra-o localmente no seu computador.";
+        
+        const modal = document.getElementById('successModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Garante que o botão volta ao estado normal
+        btnRecord.classList.remove('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+        btnRecord.classList.add('bg-brand-black', 'hover:bg-brand-coral');
+        btnRecordText.innerText = 'Gravar Uso';
+        iconRecord.classList.remove('hidden');
+        iconStop.classList.add('hidden');
+      }
+    }
+
+
+    // Variável para armazenar o nome do utilizador de forma dinâmica e dados de cálculo
+    let userName = 'Felipe';
+    let basePriceSelected = 0;
+    let selectedServiceName = '';
+    let selectedUnitName = '';
+    let discountAppliedValue = 0;
+    let currentLoginMode = 'client'; // 'client' ou 'admin'
+
+    // BANCO DE DADOS LOCAL DE SERVIÇOS
+    let servicosDisponiveis = [
+      { id: 'type-opt-1', nome: 'Consulta odontológica', desc: 'Avaliação clínica detalhada com nossa equipe médica', valor: 150 },
+      { id: 'type-opt-2', nome: 'Fazer novo alinhador', desc: 'Planejamento, escaneamento 3D e confecção de alinhador', valor: 400 }
+    ];
+
+    // BANCO DE DADOS LOCAL DE DESCONTOS (CLIENTE)
+    let descontosDisponiveis = [
+      { id: 'discount-opt-1', titulo: 'Desconto para consulta', percent: 10, desc: '10% de desconto para a próxima consulta que você agendar', expira: '20/06/2026' },
+      { id: 'discount-opt-2', titulo: 'Desconto para alinhador', percent: 10, desc: '10% de desconto para fazer seu próximo alinhador', expira: '03/05/2026' }
+    ];
+
+    // BANCO DE DADOS LOCAL DE PONTOS DE COLETA (ECOSMILE)
+    let pontosColeta = [
+      { id: 'ponto-1', nome: 'Ponto de Coleta 1', endereco: 'Avenida Exemplo número 1245', lat: '-23.561', lng: '-46.655', horas: '08:00 às 20:00' },
+      { id: 'ponto-2', nome: 'Ponto de Coleta 2', endereco: 'Rua Nova número 872', lat: '-23.572', lng: '-46.681', horas: '09:00 às 18:00' },
+      { id: 'ponto-3', nome: 'Ponto de Coleta 3', endereco: 'Avenida Chocolate 389', lat: '-23.585', lng: '-46.674', horas: '08:00 às 22:00' }
+    ];
+
+    // BANCO DE DADOS LOCAL DE TOKENS GERADOS (ADM)
+    let tokensGerados = [
+      { token: '1821', desc: 'Desconto para alinhador', status: 'Disponível' },
+      { token: '1121', desc: 'Desconto para consulta', status: 'Indisponível' }
+    ];
+
+    // Coleção de tokens ativamente aceitos na tela do cliente (Dynamic Token Validation System)
+    let tokensValidos = ['ECOSMILE', 'SMILE500', '1821'];
+
+    // Inicializa a renderização dinâmica ao carregar a página de forma altamente resiliente
+    window.onload = function() {
+      try { renderizarServicosAgendamento(); } catch (e) { console.log("Erro na renderização dos serviços: ", e); }
+      try { renderizarDescontosCliente(); } catch (e) { console.log("Erro na renderização dos descontos do cliente: ", e); }
+      try { renderizarDescontosAgendamento(); } catch (e) { console.log("Erro na renderização dos descontos no agendamento: ", e); }
+      try { renderizarPontosColetaEco(); } catch (e) { console.log("Erro na renderização dos pontos do EcoSmile: ", e); }
+      try { renderizarTokensAdmin(); } catch (e) { console.log("Erro na renderização dos tokens administrativos: ", e); }
+    }
+
+    // Função de Sincronização Dinâmica do Nome do Utilizador
+    function atualizarNomeUsuario(nome) {
+      if (!nome || nome.trim() === "") return;
+      userName = nome.trim();
+      const homeUserNameEl = document.getElementById('home-user-name');
+      if (homeUserNameEl) {
+        homeUserNameEl.innerText = userName;
+      }
+    }
+
+    // Função para ofuscar o e-mail no feedback de envio (REINTRODUZIDA PARA CORRIGIR O ERRO)
+    function ofuscarEmail(email) {
+      if (!email || !email.includes('@')) return 'l********@gmail.com';
+      const [local, dominio] = email.split('@');
+      if (local.length <= 2) {
+        return local[0] + '***@' + dominio;
+      }
+      return local[0] + '*'.repeat(Math.min(8, local.length - 2)) + local[local.length - 1] + '@' + dominio;
+    }
+
+    // Função para mostrar ou ocultar as senhas
+    function togglePassword(inputId, openIconId, closedIconId) {
+      const passwordInput = document.getElementById(inputId);
+      const eyeOpen = document.getElementById(openIconId);
+      const eyeClosed = document.getElementById(closedIconId);
+      
+      if (passwordInput && eyeOpen && eyeClosed) {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeOpen.classList.add('hidden');
+          eyeClosed.classList.remove('hidden');
+        } else {
+          passwordInput.type = 'password';
+          eyeOpen.classList.remove('hidden');
+          eyeClosed.classList.add('hidden');
+        }
+      }
+    }
+
+    // Renderizador Dinâmico dos Serviços na Tela do Cliente
+    function renderizarServicosAgendamento() {
+      const container = document.getElementById('tipo-consulta-container');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      servicosDisponiveis.forEach((servico) => {
+        const activeClass = (basePriceSelected === servico.valor && selectedServiceName === servico.nome) 
+          ? 'border-brand-coral bg-brand-lightCoral/20' 
+          : 'border-brand-peach bg-white';
+        
+        const cardBtn = document.createElement('button');
+        cardBtn.type = 'button';
+        cardBtn.id = servico.id;
+        cardBtn.className = `w-full p-4 border-2 ${activeClass} rounded-3xl text-left transition-all duration-200 focus:outline-none`;
+        cardBtn.onclick = () => {
+          selecionarServicoDinamico(servico.valor, servico.nome, servico.id);
+        };
+
+        cardBtn.innerHTML = `
+          <h4 class="font-bold text-[#303030] text-sm">${servico.nome}</h4>
+          <p class="text-[10px] text-brand-grey font-medium mt-0.5">${servico.desc} — R$ ${servico.valor}</p>
+        `;
+        
+        container.appendChild(cardBtn);
+      });
+    }
+
+    // Renderizador Dinâmico da Carteira de Descontos do Cliente
+    function renderizarDescontosCliente() {
+      const container = document.getElementById('descontos-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      descontosDisponiveis.forEach((desconto) => {
+        const card = document.createElement('div');
+        card.className = "border border-brand-peach rounded-[24px] p-5 bg-white space-y-4 shadow-sm";
+        card.innerHTML = `
+          <div class="space-y-1">
+            <h3 class="text-base font-bold text-brand-black tracking-tight">${desconto.titulo}</h3>
+            <p class="text-xs text-brand-grey font-medium leading-relaxed">
+              <span class="text-brand-coral font-extrabold text-sm">${desconto.percent}%</span> ${desconto.desc}
+            </p>
+          </div>
+          <div class="flex justify-between items-center text-[11px] font-bold">
+            <span class="text-brand-emerald flex items-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
+              Disponível
+            </span>
+            <span class="text-brand-grey">Expira: ${desconto.expira}</span>
+          </div>
+          <button onclick="utilizarCupom('${desconto.percent}% para ${desconto.titulo}')" class="w-full py-3 text-white font-bold text-xs rounded-full btn-pill focus:outline-none focus:ring-4 focus:ring-brand-coral/20 shadow-sm">
+            Utilizar agora
+          </button>
+        `;
+        container.appendChild(card);
+      });
+
+      // Cupom Expirado Estático
+      const expiredCard = document.createElement('div');
+      expiredCard.className = "border border-slate-200 rounded-[24px] p-5 bg-slate-50/50 space-y-4 opacity-70";
+      expiredCard.innerHTML = `
+        <div class="space-y-1">
+          <h3 class="text-base font-bold text-slate-400 tracking-tight">Desconto para consulta</h3>
+          <p class="text-xs text-slate-400 font-medium leading-relaxed">
+            10% de desconto para a próxima consulta que você agendar
+          </p>
+        </div>
+        <div class="flex justify-between items-center text-[11px] font-bold text-slate-400">
+          <span class="flex items-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1"></span>
+            Indisponível
+          </span>
+          <span>Expirado: 22/12/2025</span>
+        </div>
+        <button disabled class="w-full py-3 bg-slate-200 text-slate-400 font-bold text-xs rounded-full cursor-not-allowed">
+          Indisponível para uso
+        </button>
+      `;
+      container.appendChild(expiredCard);
+    }
+
+    // Renderizador Dinâmico dos Descontos Selecionáveis no Formulário de Agendamento
+    function renderizarDescontosAgendamento() {
+      const agendarForm = document.getElementById('agendarForm');
+      if (!agendarForm) return;
+
+      const sections = agendarForm.querySelectorAll('.space-y-3');
+      let targetSection = null;
+      sections.forEach(sec => {
+        const span = sec.querySelector('span');
+        if (span && (span.innerText === 'DESCONTO' || span.innerText === 'Desconto' || span.textContent.trim().toUpperCase() === 'DESCONTO')) {
+          targetSection = sec;
+        }
+      });
+
+      if (!targetSection) return;
+
+      const container = targetSection.querySelector('.grid') || targetSection.querySelector('div > div') || targetSection.querySelector('div');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      descontosDisponiveis.forEach((desconto) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = desconto.id;
+        
+        const isActive = discountAppliedValue === desconto.percent;
+        const activeClass = isActive ? 'border-brand-coral bg-brand-lightCoral/20' : 'border-brand-peach bg-white';
+        
+        btn.className = `w-full p-4 border ${activeClass} rounded-3xl text-left transition-all duration-200 focus:outline-none`;
+        btn.onclick = () => {
+          toggleDescontoDinamico(desconto.percent, desconto.id);
+        };
+
+        btn.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-brand-coral font-bold text-xs">${desconto.titulo}</span>
+            <span class="text-[10px] text-brand-grey">Expira: ${desconto.expira}</span>
+          </div>
+          <p class="text-[10px] text-brand-grey font-medium mt-1">${desconto.desc}</p>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    // Alternador inteligente de descontos no agendamento
+    function toggleDescontoDinamico(percent, id) {
+      const activeBtn = document.getElementById(id);
+      const wasActive = activeBtn.classList.contains('border-brand-coral');
+
+      descontosDisponiveis.forEach(d => {
+        const btn = document.getElementById(d.id);
+        if (btn) {
+          btn.classList.add('border-brand-peach', 'bg-white');
+          btn.classList.remove('border-brand-coral', 'bg-brand-lightCoral/20');
+        }
+      });
+
+      if (wasActive) {
+        discountAppliedValue = 0;
+      } else {
+        activeBtn.classList.remove('border-brand-peach', 'bg-white');
+        activeBtn.classList.add('border-brand-coral', 'bg-brand-lightCoral/20');
+        discountAppliedValue = percent;
+      }
+
+      calcularResumoAgendamento();
+    }
+
+    // Renderizador Dinâmico dos Pontos de Coleta do EcoSmile
+    function renderizarPontosColetaEco() {
+      const container = document.getElementById('ecosmile-points-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      pontosColeta.forEach((ponto) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full p-4 border border-[#ffd4ab] hover:border-[#ff9466] rounded-2xl bg-white hover:bg-slate-50/50 transition-all duration-200 text-left flex items-start space-x-3 group";
+        btn.onclick = () => {
+          simularRota(ponto.endereco);
+        };
+
+        btn.innerHTML = `
+          <span class="p-2 bg-[#ffe5cc] text-[#ff9466] rounded-xl flex-shrink-0 group-hover:scale-105 transition-transform">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </span>
+          <div>
+            <h4 class="font-bold text-[#303030]">${ponto.nome}</h4>
+            <p class="text-[10px] text-brand-grey mt-0.5">${ponto.endereco}</p>
+            <p class="text-[9px] text-[#296e6e] mt-0.5">⏰ ${ponto.horas}</p>
+          </div>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    // Renderizador Dinâmico da Lista de Tokens no Painel de Admin
+    function renderizarTokensAdmin() {
+      const container = document.getElementById('admin-tokens-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      tokensGerados.forEach((item) => {
+        const isDisponivel = item.status === 'Disponível';
+        const cardStyle = isDisponivel ? 'border-brand-peach bg-white' : 'border-slate-200 bg-slate-50/50 opacity-70';
+        const statusColor = isDisponivel ? 'text-brand-emerald' : 'text-slate-400';
+        const statusBadge = isDisponivel 
+          ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>' 
+          : '<span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>';
+
+        const tokenCard = document.createElement('div');
+        tokenCard.className = `w-full p-4 border ${cardStyle} rounded-2xl flex justify-between items-center text-xs font-bold shadow-xs animate-fade-in`;
+        tokenCard.innerHTML = `
+          <div class="space-y-0.5">
+            <span class="text-brand-coral text-sm tracking-wide block">${item.token}</span>
+            <p class="text-[10px] text-brand-grey font-semibold">${item.desc}</p>
+          </div>
+          <div class="flex items-center text-[10px] ${statusColor}">
+            ${statusBadge}
+            <span>${item.status}</span>
+          </div>
+        `;
+        container.appendChild(tokenCard);
+      });
+    }
+
+    // Seleção de serviço dinâmico renderizado
+    function selecionarServicoDinamico(valor, nome, id) {
+      basePriceSelected = valor;
+      selectedServiceName = nome;
+
+      servicosDisponiveis.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) {
+          el.classList.add('border-brand-peach', 'bg-white');
+          el.classList.remove('border-brand-coral', 'bg-brand-lightCoral/20');
+        }
+      });
+
+      const activeEl = document.getElementById(id);
+      if (activeEl) {
+        activeEl.classList.remove('border-brand-peach', 'bg-white');
+        activeEl.classList.add('border-brand-coral', 'bg-brand-lightCoral/20');
+      }
+
+      calcularResumoAgendamento();
+    }
+
+    // Função para a seleção das Unidades de Atendimento
+    function selecionarUnidade(nomeUnidade, optSelectedId, optUn1Id, optUn2Id) {
+      selectedUnitName = nomeUnidade;
+
+      const sel = document.getElementById(optSelectedId);
+      const un1 = document.getElementById(optUn1Id);
+      const un2 = document.getElementById(optUn2Id);
+
+      if (sel) {
+        sel.classList.add('border-brand-coral', 'bg-brand-lightCoral/20');
+        sel.classList.remove('border-brand-peach', 'bg-white');
+      }
+
+      [un1, un2].forEach(un => {
+        if (un) {
+          un.classList.add('border-brand-peach', 'bg-white');
+          un.classList.remove('border-brand-coral', 'bg-brand-lightCoral/20');
+        }
+      });
+    }
+
+    // Alternar abas do Login (Cliente x Administrador)
+    function alternarTipoLogin(mode) {
+      currentLoginMode = mode;
+      
+      const tabClient = document.getElementById('tab-login-client');
+      const tabAdmin = document.getElementById('tab-login-admin');
+      const loginTitle = document.getElementById('login-welcome-title');
+      const loginSubtitle = document.getElementById('login-form-subtitle');
+      const signupLink = document.getElementById('login-signup-link');
+      const adminBtn = document.getElementById('btnAdminDemo');
+      const passField = document.getElementById('login-password-container');
+
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+
+      if (mode === 'admin') {
+        tabAdmin.className = "flex-1 py-2.5 rounded-xl bg-white text-brand-coral shadow-xs focus:outline-none transition-all";
+        tabClient.className = "flex-1 py-2.5 rounded-xl text-brand-grey hover:text-brand-black focus:outline-none transition-all";
+        
+        loginTitle.innerText = "Painel de Controle";
+        loginSubtitle.innerText = "Autenticação de Administrador";
+        signupLink.classList.add('hidden');
+        adminBtn.classList.remove('hidden');
+      } else {
+        tabClient.className = "flex-1 py-2.5 rounded-xl bg-white text-brand-coral shadow-xs focus:outline-none transition-all";
+        tabAdmin.className = "flex-1 py-2.5 rounded-xl text-brand-grey hover:text-brand-black focus:outline-none transition-all";
+        
+        loginTitle.innerText = "Boas-vindas de volta";
+        loginSubtitle.innerText = "Fazer Login:";
+        signupLink.classList.remove('hidden');
+        adminBtn.classList.add('hidden');
+      }
+    }
+
+    // Preenchimento automático para acelerar testes de admin
+    function autofillAdminAndLogin() {
+      currentLoginMode = 'admin';
+      document.getElementById('login-email').value = "admin@sousmile.com";
+      document.getElementById('login-password').value = "admin123";
+      document.getElementById('btnSubmitLogin').click();
+    }
+
+    // Navegações de Transição de View
+    function irParaCadastro() {
+      transicionarTelas('view-login', 'view-cadastro', 'cadastro');
+    }
+
+    // Retorna para a tela de Login
+    function irParaLogin() {
+      const activeViewId = !document.getElementById('view-cadastro').classList.contains('hidden') ? 'view-cadastro' : 'view-recuperar';
+      transicionarTelas(activeViewId, 'view-login', 'login');
+    }
+
+    // Ir para a tela de recuperação de senha
+    function irParaRecuperar() {
+      resgatarFormularioRecuperacao();
+      const emailLogin = document.getElementById('login-email').value;
+      if (emailLogin) {
+        document.getElementById('recuperar-email').value = emailLogin;
+      }
+      transicionarTelas('view-login', 'view-recuperar', 'recuperar');
+    }
+
+    function irParaHome() {
+      transicionarTelas('view-login', 'view-home', 'home');
+    }
+
+    // Transição específica para a tela EcoSmile
+    function irParaEcoSmile() {
+      transicionarTelas('view-home', 'view-ecosmile', 'ecosmile');
+    }
+
+    // Transição específica para a tela de Descontos
+    function irParaDescontos() {
+      transicionarTelas('view-home', 'view-descontos', 'descontos');
+    }
+
+    // Transição específica para a nova tela de Agendamento
+    function irParaAgendar() {
+      resetarFormularioAgendamento();
+      transicionarTelas('view-home', 'view-agendar', 'agendar');
+    }
+
+    // Transição específica para a nova tela de Histórico
+    function irParaHistorico() {
+      transicionarTelas('view-home', 'view-historico', 'historico');
+    }
+
+    // Transições de Administração
+    function irParaCriarConsultaAdmin() {
+      document.getElementById('adminCriarConsultaForm').reset();
+      transicionarTelas('view-admin-dashboard', 'view-admin-criar-consulta', 'admin-criar-consulta');
+    }
+
+    // Transição específica para a nova tela de Criação de Desconto (Admin)
+    function irParaCriarDescontoAdmin() {
+      document.getElementById('adminCriarDescontoForm').reset();
+      transicionarTelas('view-admin-dashboard', 'view-admin-criar-desconto', 'admin-criar-desconto');
+    }
+
+    // Transição específica para a nova tela de Criação de Ponto (Admin)
+    function irParaCriarPontoAdmin() {
+      document.getElementById('adminCriarPontoForm').reset();
+      transicionarTelas('view-admin-dashboard', 'view-admin-criar-ponto', 'admin-criar-ponto');
+    }
+
+    // Transição para a nova tela de Gerar Token
+    function irParaGerarTokenAdmin() {
+      document.getElementById('adminGerarTokenForm').reset();
+      transicionarTelas('view-admin-dashboard', 'view-admin-gerar-token', 'admin-gerar-token');
+    }
+
+    function sairDaConta() {
+      const activeView = obterViewAtiva();
+      alternarTipoLogin('client');
+      
+      // Limpa os campos para evitar que credenciais antigas continuem preenchidas
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+      
+      transicionarTelas(`view-${activeView}`, 'view-login', 'login');
+    }
+
+    // Navegação inteligente do botão físico voltar (<)
+    function voltarParaAnterior() {
+      const activeView = obterViewAtiva();
+      if (activeView === 'cadastro' || activeView === 'recuperar') {
+        irParaLogin();
+      } else if (activeView === 'ecosmile' || activeView === 'descontos' || activeView === 'agendar' || activeView === 'historico') {
+        transicionarTelas(`view-${activeView}`, 'view-home', 'home');
+      } else if (activeView === 'admin-criar-consulta' || activeView === 'admin-criar-desconto' || activeView === 'admin-criar-ponto' || activeView === 'admin-gerar-token') {
+        transicionarTelas(`view-${activeView}`, 'view-admin-dashboard', 'admin-dashboard');
+      }
+    }
+
+    function obterViewAtiva() {
+      if (!document.getElementById('view-cadastro').classList.contains('hidden')) return 'cadastro';
+      if (!document.getElementById('view-recuperar').classList.contains('hidden')) return 'recuperar';
+      if (!document.getElementById('view-ecosmile').classList.contains('hidden')) return 'ecosmile';
+      if (!document.getElementById('view-descontos').classList.contains('hidden')) return 'descontos';
+      if (!document.getElementById('view-agendar').classList.contains('hidden')) return 'agendar';
+      if (!document.getElementById('view-historico').classList.contains('hidden')) return 'historico';
+      if (!document.getElementById('view-admin-dashboard').classList.contains('hidden')) return 'admin-dashboard';
+      if (!document.getElementById('view-admin-criar-consulta').classList.contains('hidden')) return 'admin-criar-consulta';
+      if (!document.getElementById('view-admin-criar-desconto').classList.contains('hidden')) return 'admin-criar-desconto';
+      if (!document.getElementById('view-admin-criar-ponto').classList.contains('hidden')) return 'admin-criar-ponto';
+      if (!document.getElementById('view-admin-gerar-token').classList.contains('hidden')) return 'admin-gerar-token';
+      if (!document.getElementById('view-home').classList.contains('hidden')) return 'home';
+      return 'login';
+    }
+
+    // Transição genérica de CSS das Views com proteção contra travamento de frame (Reflow layout)
+    function transicionarTelas(origemId, destinoId, viewNome) {
+      const origem = document.getElementById(origemId);
+      const destino = document.getElementById(destinoId);
+      const backButton = document.getElementById('header-back-button');
+      const phoneFooter = document.getElementById('phone-footer');
+
+      // Controla a visibilidade do botão voltar (oculto nas telas raízes)
+      if (viewNome === 'home' || viewNome === 'admin-dashboard' || viewNome === 'login') {
+        backButton.style.visibility = 'hidden';
+      } else {
+        backButton.style.visibility = 'visible';
+      }
+
+      // Controla a visibilidade do rodapé de termos
+      if (viewNome === 'login' || viewNome === 'cadastro' || viewNome === 'recuperar') {
+        phoneFooter.classList.remove('hidden'); // Restaura o rodapé de termos nas telas de autenticação
+      } else {
+        phoneFooter.classList.add('hidden'); // Oculta o rodapé para focar no scroll nas demais telas
+      }
+
+      origem.classList.add('opacity-0');
+      origem.classList.remove('opacity-100');
+      
+      setTimeout(() => {
+        origem.classList.add('hidden');
+        if (destino) {
+          destino.classList.remove('hidden');
+          
+          // FORÇA UM REFLUXO ÓPTICO (Layout Reflow) no motor de renderização do navegador
+          void destino.offsetWidth;
+          
+          setTimeout(() => {
+            destino.classList.remove('opacity-0', 'translate-x-8', '-translate-x-8');
+            destino.classList.add('opacity-100', 'translate-x-0');
+          }, 50);
+        }
+      }, 200);
+    }
+
+    // Resgata o formulário original de recuperação limpo (restaura o logo)
+    function resgatarFormularioRecuperacao() {
+      document.getElementById('recuperar-logo').classList.remove('hidden');
+      document.getElementById('recuperar-estado-formulario').classList.remove('hidden');
+      document.getElementById('recuperar-estado-sucesso').classList.add('hidden');
+    }
+
+    // Reseta todo o fluxo e retorna ao login
+    function resetarERetornarLogin() {
+      document.getElementById('recuperar-email').value = '';
+      resgatarFormularioRecuperacao();
+      irParaLogin();
+    }
+
+    // Simulação de preparo do alinhador
+    function abrirPassosPreparo() {
+      const modal = document.getElementById('preparoModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Fecha os passos de preparo
+    function fecharPreparo() {
+      const modal = document.getElementById('preparoModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Simulação do traçado de rota de coleta
+    function simularRota(endereco) {
+      document.getElementById('modalTitle').innerText = "Rota Traçada!";
+      document.getElementById('modalDesc').innerText = `O aplicativo integrou com o seu mapa para levá-lo ao ponto de coleta localizado em: ${endereco}.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Simula a ativação de um cupom
+    function utilizarCupom(nomeCupom) {
+      document.getElementById('modalTitle').innerText = "Desconto Ativado!";
+      document.getElementById('modalDesc').innerText = `Cupom de "${nomeCupom}" foi copiado e aplicado automaticamente na sua conta para sua próxima transação!`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Validador de Token EcoSmile Dinâmico
+    function validarTokenEco() {
+      const input = document.getElementById('token-input');
+      const token = input.value.trim().toUpperCase();
+      const successMsg = document.getElementById('token-success');
+      const errorMsg = document.getElementById('token-error');
+
+      successMsg.classList.add('hidden');
+      successMsg.classList.remove('flex');
+      errorMsg.classList.add('hidden');
+      errorMsg.classList.remove('flex');
+
+      if (token === "") return;
+
+      // Verifica no array unificado de tokens válidos
+      if (tokensValidos.includes(token)) {
+        successMsg.classList.remove('hidden');
+        successMsg.classList.add('flex');
+        input.value = "";
+      } else {
+        errorMsg.classList.remove('hidden');
+        errorMsg.classList.add('flex');
+      }
+    }
+
+    // ================= FUNÇÕES DO AGENDAMENTO DINÂMICO =================
+
+    function calcularResumoAgendamento() {
+      const subtotalEl = document.getElementById('summary-subtotal');
+      const discountRow = document.getElementById('summary-discount-row');
+      const discountEl = document.getElementById('summary-discount');
+      const totalEl = document.getElementById('summary-total');
+
+      subtotalEl.innerText = `R$ ${basePriceSelected}`;
+
+      if (discountAppliedValue > 0 && basePriceSelected > 0) {
+        const desconto = (basePriceSelected * discountAppliedValue) / 100;
+        const total = basePriceSelected - desconto;
+
+        discountRow.classList.remove('hidden');
+        discountEl.innerText = `-R$ ${desconto}`;
+        totalEl.innerText = `R$ ${total}`;
+      } else {
+        discountRow.classList.add('hidden');
+        totalEl.innerText = `R$ ${basePriceSelected}`;
+      }
+    }
+
+    // Reset de agendamentos
+    function resetarFormularioAgendamento() {
+      basePriceSelected = 0;
+      selectedServiceName = '';
+      selectedUnitName = '';
+      discountAppliedValue = 0;
+
+      renderizarServicosAgendamento();
+
+      const elementsToReset = [
+        'unit-opt-1', 'unit-opt-2', 'unit-opt-3',
+        'discount-opt-1', 'discount-opt-2'
+      ];
+      elementsToReset.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.add('border-brand-peach', 'bg-white');
+          el.classList.remove('border-brand-coral', 'bg-brand-lightCoral/20');
+        }
+      });
+
+      document.getElementById('agendar-data').value = '';
+      document.getElementById('agendar-hora').value = '';
+      calcularResumoAgendamento();
+    }
+
+    function confirmarAgendamento(event) {
+      event.preventDefault();
+
+      if (basePriceSelected === 0) {
+        alert("Por favor, selecione um tipo de consulta.");
+        return;
+      }
+      if (selectedUnitName === '') {
+        alert("Por favor, selecione uma unidade.");
+        return;
+      }
+
+      const dataInput = document.getElementById('agendar-data').value;
+      const horaInput = document.getElementById('agendar-hora').value;
+      const dataFormatada = dataInput.split('-').reverse().join('/');
+
+      const container = document.getElementById('dynamic-appointments');
+      const newCard = document.createElement('div');
+      newCard.className = "border border-brand-peach rounded-[24px] p-5 bg-white space-y-3 shadow-sm animate-fade-in";
+      newCard.innerHTML = `
+        <div class="flex justify-between items-start">
+          <span class="bg-[#d1f0f0] text-[#296e6e] text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Confirmada</span>
+          <span class="text-[11px] text-brand-grey font-bold">${dataFormatada} às ${horaInput}</span>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-brand-black tracking-tight">${selectedServiceName}</h3>
+          <p class="text-[10px] text-brand-grey font-medium mt-0.5">${selectedUnitName}</p>
+        </div>
+      `;
+      container.prepend(newCard);
+
+      document.getElementById('modalTitle').innerText = "Agendamento Efetuado!";
+      document.getElementById('modalDesc').innerText = `Sua consulta de "${selectedServiceName}" foi agendada para ${dataFormatada} às ${horaInput} na unidade ${selectedUnitName}.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function alternarAbasHistorico(tab) {
+      const btnUpcoming = document.getElementById('tab-upcoming');
+      const btnPast = document.getElementById('tab-past');
+      const listUpcoming = document.getElementById('upcoming-list');
+      const listPast = document.getElementById('past-list');
+
+      if (tab === 'upcoming') {
+        btnUpcoming.classList.add('border-brand-coral', 'text-brand-coral');
+        btnUpcoming.classList.remove('border-transparent', 'text-brand-grey');
+        
+        btnPast.classList.add('border-transparent', 'text-brand-grey');
+        btnPast.classList.remove('border-brand-coral', 'text-brand-coral');
+
+        listUpcoming.classList.remove('hidden');
+        listPast.classList.add('hidden');
+      } else {
+        btnPast.classList.add('border-brand-coral', 'text-brand-coral');
+        btnPast.classList.remove('border-transparent', 'text-brand-grey');
+        
+        btnUpcoming.classList.add('border-transparent', 'text-brand-grey');
+        btnUpcoming.classList.remove('border-brand-coral', 'text-brand-coral');
+
+        listPast.classList.remove('hidden');
+        listUpcoming.classList.add('hidden');
+      }
+    }
+
+    // ================= FUNÇÕES DO FLUXO DO ADMINISTRADOR =================
+
+    // Criação de nova consulta pelo administrador
+    function criarNovaConsultaAdmin(event) {
+      event.preventDefault();
+      
+      const tituloInput = document.getElementById('admin-new-title');
+      const unidadeInput = document.getElementById('admin-new-unit');
+      const valorInput = document.getElementById('admin-new-value');
+
+      const titulo = tituloInput.value.trim();
+      const unidade = unidadeInput.value.trim();
+      const valor = parseFloat(valorInput.value);
+
+      const novoId = `dynamic-opt-${Date.now()}`;
+
+      servicosDisponiveis.push({
+        id: novoId,
+        nome: titulo,
+        desc: `Unidade: ${unidade}`,
+        valor: valor
+      });
+
+      renderizarServicosAgendamento();
+
+      tituloInput.value = '';
+      unidadeInput.value = '';
+      valorInput.value = '';
+
+      document.getElementById('modalTitle').innerText = "Consulta Cadastrada!";
+      document.getElementById('modalDesc').innerText = `O tipo de consulta "${titulo}" (R$ ${valor}) foi cadastrado de forma dinâmica e agora já está disponível para seleção dos clientes na tela de agendamentos.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Criação de novo desconto pelo administrador
+    function criarNovoDescontoAdmin(event) {
+      event.preventDefault();
+
+      const tituloInput = document.getElementById('admin-discount-title');
+      const expInput = document.getElementById('admin-discount-expiry');
+      const valInput = document.getElementById('admin-discount-value');
+
+      const titulo = tituloInput.value.trim();
+      const expDate = expInput.value;
+      const valor = parseInt(valInput.value);
+
+      const dataFormatada = expDate.split('-').reverse().join('/');
+      const novoId = `dynamic-disc-${Date.now()}`;
+
+      descontosDisponiveis.push({
+        id: novoId,
+        titulo: titulo,
+        percent: valor,
+        desc: `${valor}% de desconto aplicável de acordo com o regulamento.`,
+        expira: dataFormatada
+      });
+
+      renderizarDescontosCliente();
+      renderizarDescontosAgendamento();
+
+      tituloInput.value = '';
+      expInput.value = '';
+      valInput.value = '';
+
+      document.getElementById('modalTitle').innerText = "Desconto Cadastrado!";
+      document.getElementById('modalDesc').innerText = `O desconto de ${valor}% ("${titulo}") foi gerado dinamicamente no sistema e estará visível na carteira e agendamento dos pacientes.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Criação de novo ponto de coleta EcoSmile pelo administrador
+    function criarNovoPontoAdmin(event) {
+      event.preventDefault();
+
+      const nomeInput = document.getElementById('admin-point-name');
+      const endInput = document.getElementById('admin-point-address');
+      const latInput = document.getElementById('admin-point-lat');
+      const lngInput = document.getElementById('admin-point-lng');
+      const hoursInput = document.getElementById('admin-point-hours');
+
+      const nome = nomeInput.value.trim();
+      const endereco = endInput.value.trim();
+      const lat = latInput.value.trim();
+      const lng = lngInput.value.trim();
+      const horas = hoursInput.value.trim();
+
+      const novoId = `dynamic-ponto-${Date.now()}`;
+
+      pontosColeta.push({
+        id: novoId,
+        nome: nome,
+        endereco: endereco,
+        lat: lat,
+        lng: lng,
+        horas: horas
+      });
+
+      renderizarPontosColetaEco();
+
+      nomeInput.value = '';
+      endInput.value = '';
+      latInput.value = '';
+      lngInput.value = '';
+      hoursInput.value = '';
+
+      document.getElementById('modalTitle').innerText = "Ponto de Coleta Ativado!";
+      document.getElementById('modalDesc').innerText = `O ponto de coleta sustentável "${nome}" foi cadastrado no banco de dados e aparecerá no mapa EcoSmile.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    // Geração Real de Token pelo administrador
+    function criarNovoTokenAdmin(event) {
+      event.preventDefault();
+
+      const descInput = document.getElementById('admin-token-discount-type');
+      const descricao = descInput.value.trim();
+
+      // Gera um número randômico de 4 dígitos
+      const randomToken = Math.floor(1000 + Math.random() * 9000).toString();
+
+      // Adiciona na coleção de tokens listados
+      tokensGerados.unshift({
+        token: randomToken,
+        desc: descricao,
+        status: 'Disponível'
+      });
+
+      // Crucial: Insere esse novo token no sistema de validação do cliente
+      tokensValidos.push(randomToken);
+
+      // Re-renderiza a lista visual
+      renderizarTokensAdmin();
+
+      // Limpa o input
+      descInput.value = '';
+
+      document.getElementById('modalTitle').innerText = "Token Criado!";
+      document.getElementById('modalDesc').innerText = `Token "${randomToken}" criado com sucesso para "${descricao}". Os clientes agora podem utilizá-lo de forma dinâmica no EcoSmile!`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function simularAcao(nomeAcao) {
+      document.getElementById('modalTitle').innerText = `${nomeAcao}`;
+      document.getElementById('modalDesc').innerText = `Ação administrativa de "${nomeAcao}" foi ativada com sucesso no protótipo.`;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function executarRecuperacao(event) {
+      event.preventDefault();
+      const emailDigitado = document.getElementById('recuperar-email').value;
+      const btnSubmit = document.getElementById('btnSubmitRecuperar');
+      
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `
+        <span class="inline-flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Enviando...
+        </span>
+      `;
+
+      setTimeout(() => {
+        document.getElementById('email-obfuscado').innerText = ofuscarEmail(emailDigitado);
+        document.getElementById('recuperar-logo').classList.add('hidden');
+        document.getElementById('recuperar-estado-formulario').classList.add('hidden');
+        document.getElementById('recuperar-estado-sucesso').classList.remove('hidden');
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = 'Enviar e-mail de recuperação';
+      }, 950);
+    }
+
+    function executarLogin(event) {
+      event.preventDefault();
+      
+      const emailDigitado = document.getElementById('login-email').value;
+      
+      const btnSubmit = document.getElementById('btnSubmitLogin');
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `
+        <span class="inline-flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Autenticando...
+        </span>
+      `;
+
+      setTimeout(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = 'Entrar';
+
+        if (currentLoginMode === 'admin') {
+          transicionarTelas('view-login', 'view-admin-dashboard', 'admin-dashboard');
+        } else {
+          if (emailDigitado && !emailDigitado.startsWith('felipe')) {
+            const parteLocal = emailDigitado.split('@')[0];
+            const nomeCapitalizado = parteLocal.charAt(0).toUpperCase() + parteLocal.slice(1);
+            atualizarNomeUsuario(nomeCapitalizado);
+          } else {
+            atualizarNomeUsuario('Felipe');
+          }
+          irParaHome();
+        }
+      }, 800);
+    }
+
+    function executarCadastro(event) {
+      event.preventDefault();
+      const nomeDigitado = document.getElementById('cadastro-nome').value;
+      if (nomeDigitado) {
+        atualizarNomeUsuario(nomeDigitado);
+      }
+
+      const btnSubmit = document.getElementById('btnSubmitCadastro');
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `
+        <span class="inline-flex items-center justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Cadastrando...
+        </span>
+      `;
+
+      setTimeout(() => {
+        document.getElementById('modalTitle').innerText = "Cadastro Realizado!";
+        document.getElementById('modalDesc').innerText = "Sua conta foi criada com sucesso no protótipo SouSmile.";
+        
+        const modal = document.getElementById('successModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = 'Cadastrar';
+      }, 900);
+    }
+
+    function fecharModal() {
+      const modal = document.getElementById('successModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      
+      const cadastroView = document.getElementById('view-cadastro');
+      const agendarView = document.getElementById('view-agendar');
+      const adminCriarConsultaView = document.getElementById('view-admin-criar-consulta');
+      const adminCriarDescontoView = document.getElementById('view-admin-criar-desconto');
+      const adminCriarPontoView = document.getElementById('view-admin-criar-ponto');
+      const adminGerarTokenView = document.getElementById('view-admin-gerar-token');
+
+      if (!cadastroView.classList.contains('hidden')) {
+        transicionarTelas('view-cadastro', 'view-home', 'home');
+      } else if (!agendarView.classList.contains('hidden')) {
+        transicionarTelas('view-agendar', 'view-historico', 'historico');
+        alternarAbasHistorico('upcoming');
+      } else if (!adminCriarConsultaView.classList.contains('hidden') || !adminCriarDescontoView.classList.contains('hidden') || !adminCriarPontoView.classList.contains('hidden') || !adminGerarTokenView.classList.contains('hidden')) {
+        const activeView = obterViewAtiva();
+        transicionarTelas(activeView, 'view-admin-dashboard', 'admin-dashboard');
+      }
+    }
+
+    function baixarComoPNG() {
+      const phoneElement = document.getElementById('phone-simulator');
+      const btnDownload = document.getElementById('btnDownload');
+      const btnDownloadText = document.getElementById('btnDownloadText');
+      
+      let activeView = 'login';
+      if (!document.getElementById('view-cadastro').classList.contains('hidden')) {
+        activeView = 'cadastro';
+      } else if (!document.getElementById('view-home').classList.contains('hidden')) {
+        activeView = 'home';
+      } else if (!document.getElementById('view-ecosmile').classList.contains('hidden')) {
+        activeView = 'ecosmile';
+      } else if (!document.getElementById('view-descontos').classList.contains('hidden')) {
+        activeView = 'descontos';
+      } else if (!document.getElementById('view-agendar').classList.contains('hidden')) {
+        activeView = 'agendar';
+      } else if (!document.getElementById('view-historico').classList.contains('hidden')) {
+        activeView = 'historico';
+      } else if (!document.getElementById('view-admin-dashboard').classList.contains('hidden')) {
+        activeView = 'admin_dashboard';
+      } else if (!document.getElementById('view-admin-criar-consulta').classList.contains('hidden')) {
+        activeView = 'admin_criar_consulta';
+      } else if (!document.getElementById('view-admin-criar-desconto').classList.contains('hidden')) {
+        activeView = 'admin_criar_desconto';
+      } else if (!document.getElementById('view-admin-criar-ponto').classList.contains('hidden')) {
+        activeView = 'admin_criar_ponto';
+      } else if (!document.getElementById('view-admin-gerar-token').classList.contains('hidden')) {
+        activeView = 'admin_gerar_token';
+      } else if (!document.getElementById('view-recuperar').classList.contains('hidden')) {
+        const isSucesso = document.getElementById('recuperar-estado-sucesso').classList.contains('hidden') ? '' : '_sucesso';
+        activeView = `recuperar${isSucesso}`;
+      }
+      
+      btnDownload.disabled = true;
+      btnDownloadText.innerText = "Processando...";
+
+      html2canvas(phoneElement, {
+        useCORS: true, 
+        backgroundColor: null,
+        scale: 2,
+        logging: false
+      }).then(canvas => {
+        const image = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.download = `sousmile_tela_${activeView}.png`;
+        link.href = image;
+        link.click();
+        
+        btnDownload.disabled = false;
+        btnDownloadText.innerText = "Baixar como PNG";
+      }).catch(err => {
+        console.error("Erro ao gerar PNG:", err);
+        btnDownload.disabled = false;
+        btnDownloadText.innerText = "Tentar Novamente";
+      });
+    }
+  </script>
 </body>
 </html>
